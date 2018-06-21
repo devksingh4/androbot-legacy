@@ -47,6 +47,6 @@ async def clear(ctx, amount=0):
 
 @client.command()
 async def info():
-  await client.say('AndroBot is a pet project by @AndroStudios#8686. The prefix is "?". The following commands are available: "mai", "ping", and "info")
+  await client.say('AndroBot is a pet project by @AndroStudios#8686. The prefix is "?". The following commands are available: "ai", "ping", and "info")
 
 client.run(token1)
