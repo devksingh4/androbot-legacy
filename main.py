@@ -1,6 +1,7 @@
 import discord
 import sys
 import os
+import requests
 from chatterbot import ChatBot
 from discord.ext import commands
 from discord import Game, Embed
@@ -8,7 +9,7 @@ from discord.voice_client import VoiceClient
 import asyncio as asyncio
 
 client = commands.Bot(command_prefix= '?')
-startup_extensions = ["Music"]
+startup_extensions = ["Music","League_of_Legends"]
 
 if __name__ == "__main__":
   for extension in startup_extensions:

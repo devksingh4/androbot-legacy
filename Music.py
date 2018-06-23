@@ -154,6 +154,7 @@ class Music:
             await state.songs.put(entry)
     @commands.command(pass_context=True)
     async def pause(self, ctx):
+        """Allows you to pause the current-playing audio"""
         state = self.get_voice_state(ctx.message.server)
         player = state.player
         VoiceState.is_playing = False
