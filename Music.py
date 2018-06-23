@@ -101,7 +101,7 @@ class Music:
         except discord.ClientException:
             await self.client.say('Already in a voice channel...')
         else:
-            await self.client.say('Ready to play audio in **' + channel.name)
+            await self.client.say('Joined.')
 
     @commands.command(pass_context=True, no_pm=True)
     async def summon(self, ctx):
@@ -132,10 +132,6 @@ class Music:
         opts = {
             'default_search': 'auto',
             'quiet': True,
-            'no-call-home': True,
-            'extract-audio': True,
-            'audio-quality': "128K"
-
         }
 
         print(state)
@@ -159,19 +155,11 @@ class Music:
     @commands.command(pass_context=True)
     async def pause(self, ctx):
         state = self.get_voice_state(ctx.message.server)
-        if state.is_playing():
-            #set playing state to false:
-            VoiceState.is_playing = False
-            #actually pause audio stream:
-
-        else:
-            #Nothing playing so we cannot pause
-            await self.client.say('Cannot pause the player, either because it is already paused or there is nothing playing.')
-#        if self._current_player:
- #           self._current_player.pause()
-  #          self.emit('pause', player=self, entry=self.current_entry)
-   #         return
-
+        player = state.player
+        VoiceState.is_playing = False
+        print(VoiceState.is_playing)
+        player.pause()
+        #actually pause audio stream:
     @commands.command(pass_context=True, no_pm=True)
     async def volume(self, ctx, value : int):
         """Sets the volume of the currently playing song."""
@@ -182,12 +170,12 @@ class Music:
             player.volume = value / 100
             await self.client.say('Set the volume to {:.0%}'.format(player.volume))
     @commands.command(pass_context=True, no_pm=True)
-    async def resume(self, ctx):
+    async def resume(self, ctx):   
         """Resumes the currently played song."""
         state = self.get_voice_state(ctx.message.server)
-        if state.is_playing():
-            player = state.player
-            player.resume()
+        player = state.player
+        player.resume()
+        VoiceState.is_playing = True
 
     @commands.command(pass_context=True, no_pm=True)
     async def stop(self, ctx):
@@ -195,12 +183,9 @@ class Music:
         This also clears the queue.
         """
         server = ctx.message.server
-        state = self.get_voice_state(server)
-
-        if state.is_playing():
-            player = state.player
-            player.stop()
-
+        state = self.get_voice_state(ctx.message.server)
+        player = state.player
+        player.stop()
         try:
             state.audio_player.cancel()
             del self.voice_states[server.id]
@@ -221,6 +206,7 @@ class Music:
             return
 
         voter = ctx.message.author
+        voter.role = ctx.message.author.role
         if voter == state.current.requester:
             await self.client.say('Requester requested skipping song...')
             state.skip()
