@@ -96,10 +96,10 @@ class Music:
         """Joins a voice channel."""
         try:
             await self.create_voice_client(channel)
-        except discord.ClientException:
-            await self.client.say('Already in a voice channel...')
         except discord.InvalidArgument:
             await self.client.say('This is not a voice channel...')
+        except discord.ClientException:
+            await self.client.say('Already in a voice channel...')
         else:
             await self.client.say('Ready to play audio in **' + channel.name)
 
@@ -166,8 +166,7 @@ class Music:
 
         else:
             #Nothing playing so we cannot pause
-            return
-            raise ValueError('Cannot pause the music player since it is not playing.')
+            await self.client.say('Cannot pause the player, either because it is already paused or there is nothing playing.')
 #        if self._current_player:
  #           self._current_player.pause()
   #          self.emit('pause', player=self, entry=self.current_entry)
