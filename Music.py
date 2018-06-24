@@ -154,6 +154,7 @@ class Music:
             await state.songs.put(entry)
     @commands.command(pass_context=True)
     async def pause(self, ctx):
+        """Allows you to pause the current-playing audio"""
         state = self.get_voice_state(ctx.message.server)
         player = state.player
         VoiceState.is_playing = False
@@ -170,7 +171,7 @@ class Music:
             player.volume = value / 100
             await self.client.say('Set the volume to {:.0%}'.format(player.volume))
     @commands.command(pass_context=True, no_pm=True)
-    async def resume(self, ctx):   
+    async def resume(self, ctx): 
         """Resumes the currently played song."""
         state = self.get_voice_state(ctx.message.server)
         player = state.player
