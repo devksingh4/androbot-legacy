@@ -1,6 +1,8 @@
 import discord
 import sys
 import os
+import praw
+import random
 import requests
 from chatterbot import ChatBot
 from discord.ext import commands
@@ -17,7 +19,8 @@ if __name__ == "__main__":
       client.load_extension(extension)
     except Exception as e:
       exc = '{}: {}'.format(type(e).__name__, e)
-      print('Failed to load extension {}\n{}'.format(extension, exc))
+      raise SystemExit('Failed to load extension {}\n{}'.format(extension, exc))
+      
 
 #token = os.environ['AndroBotKey']
 token1 = sys.argv[1]
@@ -25,6 +28,8 @@ chatbot = ChatBot(
   'AndroBot',
   trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
 )
+
+#reddit = praw.reddit(client_id='g1XQ6v0haLlPqA', client_secret='',)
 
 #chatbot.train('chatterbot.corpus.english')
 
@@ -58,4 +63,11 @@ async def clear(ctx, amount=0):
     await client.delete_messages(messages)
     await client.say("Messages Cleared")
 
+#@commands.command(pass_context=True)
+#async def meme(ctx):
+ # meme_options = reddit.subreddit('memes').hot()
+ # selectedpostnum = randrom.randint(1,25)
+ # for i in range(0, selectedpostnum):
+ #   selectedpost = next(x for x in meme_options if not x.stickied)
+ # await client.say("Here is a random meme:" + selectedpost.url)
 client.run(token1)

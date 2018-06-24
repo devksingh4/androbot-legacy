@@ -8,3 +8,4 @@ Chatterbot is required for the AI function (```pip install chatterbot```). To us
 # Commands currently available: 
   1. ?ai (interface with chatterbot)
   2. ?ping (returns ```Pong!```)
+  3. Various other music plaing commands, see ?help for more details.
