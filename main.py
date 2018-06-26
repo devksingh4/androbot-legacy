@@ -36,7 +36,7 @@ chatbot = ChatBot(
 @client.event
 async def on_ready():
   print('Logged in as: ' + client.user.name + ' ' + client.user.id)
-  await client.change_presence(game=discord.Game(name='Use "?" as prefix | ?help | ' + str(len(client.servers)) + ' guilds'))
+  await client.change_presence(game=discord.Game(name='?help | ' + str(len(client.servers)) + ' guilds'))
 
 class Main_Commands():
   def __init__(self,client):

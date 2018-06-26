@@ -134,42 +134,43 @@ class Music:
             'quiet': True,
         }
 
-        print(state)
-
         if state.voice is None:
             success = await ctx.invoke(self.summon)
-            await self.client.say("Loading the song please be patient..")
-            if not success:
+            if success:
+                await self.client.say("Loading the song please be patient..")
+            elif not success:
                 return
-        
+
         try:
             player = await state.voice.create_ytdl_player(song, ytdl_options=opts, after=state.toggle_next)
         except Exception as e:
             fmt = 'An error occurred while processing this request: ```py\n{}: {}\n```'
             await self.client.send_message(ctx.message.channel, fmt.format(type(e).__name__, e))
         else:
-            player.volume = 0.6
+            player.volume = 1.0
             entry = VoiceEntry(ctx.message, player)
             await self.client.say('Queued ' + str(entry))
             await state.songs.put(entry)
+
     @commands.command(pass_context=True)
     async def pause(self, ctx):
         """Allows you to pause the current-playing audio"""
         state = self.get_voice_state(ctx.message.server)
         player = state.player
         VoiceState.is_playing = False
-        print(VoiceState.is_playing)
         player.pause()
-        #actually pause audio stream:
+        #^^^actually pause audio stream
+
     @commands.command(pass_context=True, no_pm=True)
     async def volume(self, ctx, value : int):
         """Sets the volume of the currently playing song."""
-
         state = self.get_voice_state(ctx.message.server)
         if state.is_playing():
             player = state.player
             player.volume = value / 100
             await self.client.say('Set the volume to {:.0%}'.format(player.volume))
+
+
     @commands.command(pass_context=True, no_pm=True)
     async def resume(self, ctx): 
         """Resumes the currently played song."""
