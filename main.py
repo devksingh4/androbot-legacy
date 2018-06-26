@@ -71,3 +71,4 @@ async def clear(ctx, amount=0):
  #   selectedpost = next(x for x in meme_options if not x.stickied)
  # await client.say("Here is a random meme:" + selectedpost.url)
 client.run(token1)
+  
