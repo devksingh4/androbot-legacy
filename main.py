@@ -11,7 +11,7 @@ from discord.voice_client import VoiceClient
 import asyncio as asyncio
 
 client = commands.Bot(command_prefix= '?')
-startup_extensions = ["Music","League_of_Legends"]
+startup_extensions = ["Music"]
 
 if __name__ == "__main__":
   for extension in startup_extensions:
