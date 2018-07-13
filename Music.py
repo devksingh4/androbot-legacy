@@ -210,13 +210,13 @@ class Music:
         voter = ctx.message.author
         voter_roles = ctx.message.author.roles
 
-        if 'DJ' in [y.name.upper() for y in voter_roles]:
+        if 'dj' in [y.name.lower() for y in voter_roles]:
             await self.client.say('DJ skipped, skipping song...')
             state.skip()
 
-        elif not 'DJ' in [y.name.upper() for y in voter_roles]:
+        elif not 'dj' in [y.name.lower() for y in voter_roles]:
             if voter == state.current.requester:
-                await self.client.say('Requester requested skipping song...')
+                await self.client.say('Requester requested to skip, skipping song...')
                 state.skip()
             elif voter.id not in state.skip_votes:
                 state.skip_votes.add(voter.id)
