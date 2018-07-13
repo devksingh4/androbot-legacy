@@ -221,11 +221,11 @@ class Music:
             elif voter.id not in state.skip_votes:
                 state.skip_votes.add(voter.id)
                 total_votes = len(state.skip_votes)
-                if total_votes >= 3:
+                if total_votes >= 2:
                     await self.client.say('Skip vote passed, skipping song...')
                     state.skip()    
                 else:
-                    await self.client.say('Skip vote added, currently at [{}/3]'.format(total_votes))
+                    await self.client.say('Skip vote added, currently at [{}/2]'.format(total_votes))
             else:
                 await self.client.say('You have already voted to skip this song.')
 
