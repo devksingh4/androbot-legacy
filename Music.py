@@ -198,7 +198,7 @@ class Music:
 
     @commands.command(pass_context=True, no_pm=True)
     async def skip(self, ctx):
-        """Vote to skip a song. The song requester can automatically skip.
+        """Vote to skip a song. The song requester and DJ can automatically skip.
         3 skip votes are needed for the song to be skipped.
         """
 
@@ -208,20 +208,26 @@ class Music:
             return
 
         voter = ctx.message.author
-        voter.role = ctx.message.author.role
-        if voter == state.current.requester:
-            await self.client.say('Requester requested skipping song...')
+        voter_roles = ctx.message.author.roles
+
+        if 'DJ' in [y.name.upper() for y in voter_roles]:
+            await self.client.say('DJ skipped, skipping song...')
             state.skip()
-        elif voter.id not in state.skip_votes:
-            state.skip_votes.add(voter.id)
-            total_votes = len(state.skip_votes)
-            if total_votes >= 3:
-                await self.client.say('Skip vote passed, skipping song...')
+
+        elif not 'DJ' in [y.name.upper() for y in voter_roles]:
+            if voter == state.current.requester:
+                await self.client.say('Requester requested skipping song...')
                 state.skip()
+            elif voter.id not in state.skip_votes:
+                state.skip_votes.add(voter.id)
+                total_votes = len(state.skip_votes)
+                if total_votes >= 3:
+                    await self.client.say('Skip vote passed, skipping song...')
+                    state.skip()    
+                else:
+                    await self.client.say('Skip vote added, currently at [{}/3]'.format(total_votes))
             else:
-                await self.client.say('Skip vote added, currently at [{}/3]'.format(total_votes))
-        else:
-            await self.client.say('You have already voted to skip this song.')
+                await self.client.say('You have already voted to skip this song.')
 
     @commands.command(pass_context=True, no_pm=True)
     async def playing(self, ctx):
