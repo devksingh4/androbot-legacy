@@ -29,7 +29,7 @@ chatbot = ChatBot(
   trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
 )
 
-#reddit = praw.reddit(client_id='g1XQ6v0haLlPqA', client_secret='',)
+reddit = praw.Reddit(client_id='g1XQ6v0haLlPqA', client_secret=sys.argv[2], user_agent='AndroBot by AndroStudios', username='PCLover1')
 
 #chatbot.train('chatterbot.corpus.english')
 
@@ -45,6 +45,7 @@ class Main_Commands():
 @client.command()
 async def ping(): 
   await client.say('Pong!')
+  print(reddit.user.me())
 
 @client.command(pass_context=True)
 async def ai(ctx, *, message):
@@ -63,12 +64,13 @@ async def clear(ctx, amount=0):
     await client.delete_messages(messages)
     await client.say("Messages Cleared")
 
-#@commands.command(pass_context=True)
-#async def meme(ctx):
- # meme_options = reddit.subreddit('memes').hot()
- # selectedpostnum = randrom.randint(1,25)
- # for i in range(0, selectedpostnum):
- #   selectedpost = next(x for x in meme_options if not x.stickied)
- # await client.say("Here is a random meme:" + selectedpost.url)
+@client.command(pass_context=True)
+async def meme(ctx):
+  meme_options = reddit.subreddit('memes').hot()
+  selectedpostnum = random.randint(1,25)
+  for i in range(0, selectedpostnum):
+    selectedpost = next(x for x in meme_options if not x.stickied)
+  await client.say("Here is a random meme: " + selectedpost.url)
+
 client.run(token1)
   

@@ -61,6 +61,7 @@ class VoiceState:
             await self.client.send_message(self.current.channel, 'Now playing' + str(self.current))
             self.current.player.start()
             await self.play_next_song.wait()
+            
 class Music:
     """Voice related commands.
     Works in multiple servers at once.
