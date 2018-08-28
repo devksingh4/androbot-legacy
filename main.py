@@ -22,14 +22,14 @@ if __name__ == "__main__":
       raise SystemExit('Failed to load extension {}\n{}'.format(extension, exc))
       
 
-#token = os.environ['AndroBotKey']
-token1 = sys.argv[1]
+token = os.environ['DiscordKey']
+reddit_token = os.environ['RedditKey']
 chatbot = ChatBot(
   'AndroBot',
   trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
 )
 
-reddit = praw.Reddit(client_id='g1XQ6v0haLlPqA', client_secret=sys.argv[2], user_agent='AndroBot by AndroStudios', username='PCLover1')
+reddit = praw.Reddit(client_id='g1XQ6v0haLlPqA', client_secret=reddit_token, user_agent='AndroBot by AndroStudios', username='PCLover1')
 
 #chatbot.train('chatterbot.corpus.english')
 
