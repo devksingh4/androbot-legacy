@@ -104,4 +104,4 @@ venv.bak/
 .mypy_cache/
 
 #launch script for androbot
-launch.sh
+scriptlaunch.sh
