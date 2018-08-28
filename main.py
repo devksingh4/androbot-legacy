@@ -1,6 +1,9 @@
 import discord
 import sys
 import os
+import praw
+import random
+import requests
 from chatterbot import ChatBot
 from discord.ext import commands
 from discord import Game, Embed
@@ -16,7 +19,8 @@ if __name__ == "__main__":
       client.load_extension(extension)
     except Exception as e:
       exc = '{}: {}'.format(type(e).__name__, e)
-      print('Failed to load extension {}\n{}'.format(extension, exc))
+      raise SystemExit('Failed to load extension {}\n{}'.format(extension, exc))
+      
 
 #token = os.environ['AndroBotKey']
 token1 = sys.argv[1]
@@ -25,12 +29,14 @@ chatbot = ChatBot(
   trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
 )
 
+reddit = praw.Reddit(client_id='g1XQ6v0haLlPqA', client_secret=sys.argv[2], user_agent='AndroBot by AndroStudios', username='PCLover1')
+
 #chatbot.train('chatterbot.corpus.english')
 
 @client.event
 async def on_ready():
   print('Logged in as: ' + client.user.name + ' ' + client.user.id)
-  await client.change_presence(game=discord.Game(name='Use "?" as prefix | ?help | ' + str(len(client.servers)) + ' guilds'))
+  await client.change_presence(game=discord.Game(name='?help | ' + str(len(client.servers)) + ' guilds'))
 
 class Main_Commands():
   def __init__(self,client):
@@ -39,6 +45,7 @@ class Main_Commands():
 @client.command()
 async def ping(): 
   await client.say('Pong!')
+  print(reddit.user.me())
 
 @client.command(pass_context=True)
 async def ai(ctx, *, message):
@@ -57,4 +64,13 @@ async def clear(ctx, amount=0):
     await client.delete_messages(messages)
     await client.say("Messages Cleared")
 
+@client.command(pass_context=True)
+async def meme(ctx):
+  meme_options = reddit.subreddit('memes').hot()
+  selectedpostnum = random.randint(1,25)
+  for i in range(0, selectedpostnum):
+    selectedpost = next(x for x in meme_options if not x.stickied)
+  await client.say("Here is a random meme: " + selectedpost.url)
+
 client.run(token1)
+  
