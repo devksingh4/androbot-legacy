@@ -29,7 +29,7 @@ chatbot = ChatBot(
   trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
 )
 
-reddit = praw.Reddit(client_id='ZOkK-ZCFJpcWCQ', client_secret=reddit_token, user_agent='AndroBot by AndroStudios', username='PCLover1')
+reddit = praw.Reddit(client_id='ZOkK-ZCFJpcWCQ', client_secret=reddit_token, user_agent='CardNightBot by AsyncSGD', username='androstudios')
 
 #chatbot.train('chatterbot.corpus.english')
 
