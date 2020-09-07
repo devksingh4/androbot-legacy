@@ -41,8 +41,6 @@ class Main_Commands():
 @client.command()
 async def ping(ctx): 
   await ctx.send('Pong!')
-  print(reddit.user.me())
-
 
 @client.command()
 async def clear(ctx, amount=0):
@@ -54,12 +52,12 @@ async def clear(ctx, amount=0):
 
 @client.command()
 async def meme(ctx):
-  meme_options = reddit.subreddit('memes').hot()
-  selectedpostnum = random.randint(1,25)
-  for i in range(0, selectedpostnum):
-    selectedpost = next(x for x in meme_options if not x.stickied)
-  e = discord.Embed(title="Random meme")
-  e.set_image(url=selectedpost.url)
-  await ctx.send("Here is a random meme: ", embed=e)
+    async with ctx.typing():
+      meme_options = reddit.subreddit('memes').hot()
+      selectedpostnum = random.randint(1,25)
+      for i in range(0, selectedpostnum):
+        selectedpost = next(x for x in meme_options if not x.stickied)
+      e = discord.Embed(title="Random meme").set_image(url=selectedpost.url)
+      await ctx.send("Here is a random meme: ", embed=e)
 
 client.run(token)

@@ -19,7 +19,6 @@ class VoiceError(Exception):
 class YTDLError(Exception):
     pass
 
-
 class YTDLSource(discord.PCMVolumeTransformer):
     YTDL_OPTIONS = {
         'format': 'bestaudio/best',
@@ -137,14 +136,16 @@ class Song:
         self.requester = source.requester
 
     def create_embed(self):
+        if not self.source.duration:
+            self.source.duration = 'LIVE'
         embed = (discord.Embed(title='Now playing',
-                               description='```css\n{0.source.title}\n```'.format(self),
-                               color=discord.Color.blurple())
-                 .add_field(name='Duration', value=self.source.duration)
-                 .add_field(name='Requested by', value=self.requester.mention)
-                 .add_field(name='Uploader', value='[{0.source.uploader}]({0.source.uploader_url})'.format(self))
-                 .add_field(name='URL', value='[Click]({0.source.url})'.format(self))
-                 .set_thumbnail(url=self.source.thumbnail))
+                            description='```css\n{0.source.title}\n```'.format(self),
+                            color=discord.Color.blurple())
+                .add_field(name='Duration', value=self.source.duration)
+                .add_field(name='Requested by', value=self.requester.mention)
+                .add_field(name='Uploader', value='[{0.source.uploader}]({0.source.uploader_url})'.format(self))
+                .add_field(name='URL', value='[Click]({0.source.url})'.format(self))
+                .set_thumbnail(url=self.source.thumbnail))
 
         return embed
 
@@ -176,7 +177,7 @@ class VoiceState:
     def __init__(self, bot: commands.Bot, ctx: commands.Context):
         self.bot = bot
         self._ctx = ctx
-
+        self.exists = True
         self.current = None
         self.voice = None
         self.next = asyncio.Event()
@@ -225,6 +226,7 @@ class VoiceState:
                         self.current = await self.songs.get()
                 except asyncio.TimeoutError:
                     self.bot.loop.create_task(self.stop())
+                    self.exists = False
                     return
 
             self.current.source.volume = self._volume
@@ -257,7 +259,7 @@ class Music(commands.Cog):
         self.voice_states = {}
     def get_voice_state(self, ctx: commands.Context):
         state = self.voice_states.get(ctx.guild.id)
-        if not state:
+        if not state or not state.exists:
             state = VoiceState(self.bot, ctx)
             self.voice_states[ctx.guild.id] = state
 
@@ -419,7 +421,10 @@ class Music(commands.Cog):
 
         queue = ''
         for i, song in enumerate(ctx.voice_state.songs[start:end], start=start):
-            queue += '`{0}.` [**{1.source.title}**]({1.source.url})\n'.format(i + 1, song)
+            if not song.source.time:
+                queue += '`{0}.` [**{1.source.title}**]({1.source.url}) *LIVE*\n'.format(i + 1, song)
+            else:    
+                queue += '`{0}.` [**{1.source.title}**]({1.source.url})\n'.format(i + 1, song)
 
         embed = (discord.Embed(description='**{} tracks:**\n\n{}'.format(len(ctx.voice_state.songs), queue))
                  .set_footer(text='Viewing page {}/{}'.format(page, pages)))
