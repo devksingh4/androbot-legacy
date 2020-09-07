@@ -1,4 +1,5 @@
 import discord
+from discord import TextChannel
 import sys
 import os
 import praw
@@ -9,7 +10,7 @@ from discord import Game, Embed
 from discord.voice_client import VoiceClient
 import asyncio as asyncio
 
-client = commands.Bot(command_prefix= '?')
+client = commands.AutoShardedBot(command_prefix= '?')
 startup_extensions = ["Music"]
 
 if __name__ == "__main__":
@@ -30,38 +31,35 @@ reddit = praw.Reddit(client_id='ZOkK-ZCFJpcWCQ', client_secret=reddit_token, use
 
 @client.event
 async def on_ready():
-  print('Logged in as: ' + client.user.name + ' ' + client.user.id)
-  await client.change_presence(game=discord.Game(name='?help | ' + str(len(client.servers)) + ' guilds'))
-
+  print('Logged in as: ' + str(client.user.name) + ' ' + str(client.user.id))
+  activity = discord.Game(name='?help | ' + str(len(client.guilds)) + ' guilds')
+  await client.change_presence(activity=activity)
 class Main_Commands():
   def __init__(self,client):
     self.client=client
 
 @client.command()
-async def ping(): 
-  await client.say('Pong!')
+async def ping(ctx): 
+  await ctx.send('Pong!')
   print(reddit.user.me())
 
 
-@client.command(pass_context=True)
+@client.command()
 async def clear(ctx, amount=0):
-  channel = ctx.message.channel
   if (amount == 0):
-    client.say("Please specify how many messages are to be deleted.")
+    await ctx.send("Please specify how many messages are to be deleted.")
   else:
-    amount += 1
-    messages = []
-    async for message in client.logs_from(channel, limit=int(amount)):
-      messages.append(message)
-    await client.delete_messages(messages)
-    await client.say("Messages Cleared")
+    await ctx.channel.purge(limit=amount)
+    await ctx.send("Messages Cleared")
 
-@client.command(pass_context=True)
+@client.command()
 async def meme(ctx):
   meme_options = reddit.subreddit('memes').hot()
   selectedpostnum = random.randint(1,25)
   for i in range(0, selectedpostnum):
     selectedpost = next(x for x in meme_options if not x.stickied)
-  await client.say("Here is a random meme: " + selectedpost.url)
+  e = discord.Embed(title="Random meme")
+  e.set_image(url=selectedpost.url)
+  await ctx.send("Here is a random meme: ", embed=e)
 
 client.run(token)
