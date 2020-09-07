@@ -4,7 +4,6 @@ import os
 import praw
 import random
 import requests
-from chatterbot import ChatBot
 from discord.ext import commands
 from discord import Game, Embed
 from discord.voice_client import VoiceClient
@@ -24,14 +23,10 @@ if __name__ == "__main__":
 
 token = os.environ['DiscordKey']
 reddit_token = os.environ['RedditKey']
-chatbot = ChatBot(
-  'AndroBot',
-  trainer='chatterbot.trainers.ChatterBotCorpusTrainer'
-)
+
 
 reddit = praw.Reddit(client_id='ZOkK-ZCFJpcWCQ', client_secret=reddit_token, user_agent='CardNightBot by AsyncSGD', username='androstudios')
 
-#chatbot.train('chatterbot.corpus.english')
 
 @client.event
 async def on_ready():
@@ -47,9 +42,6 @@ async def ping():
   await client.say('Pong!')
   print(reddit.user.me())
 
-@client.command(pass_context=True)
-async def ai(ctx, *, message):
-  await client.say(chatbot.get_response(message))
 
 @client.command(pass_context=True)
 async def clear(ctx, amount=0):
