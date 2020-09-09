@@ -174,6 +174,8 @@ class SongQueue(asyncio.Queue):
 
     def remove(self, index: int):
         del self._queue[index]
+    def addtop(self, song: Song):
+        self.appendleft(song)
 
 
 class VoiceState:
@@ -502,6 +504,43 @@ class Music(commands.Cog):
                     song = Song(source)
 
                     await ctx.voice_state.songs.put(song)
+                    await ctx.send('Enqueued {}'.format(str(source)))
+    @commands.command(name='playtop')
+    async def _play(self, ctx: commands.Context, *, search: str):
+        """Plays a song at the top of the queue.
+        This command automatically searches from various sites if no URL is provided.
+        A list of these sites can be found here: https://rg3.github.io/youtube-dl/supportedsites.html
+        """
+        if not ctx.voice_state.voice:
+            await ctx.invoke(self._join)
+
+        async with ctx.typing():
+            if search.lower().find("soran bushi") != -1  or search.lower().startswith("https://www.youtube.com/watch?v=dqSygB92584"):   
+                await ctx.send("<@225326981862916107> is a WEEEEEEEEEEEEEEB!")
+            if isYTPlaylist(search):
+                # invoke playlist handling
+                i = 0
+                links = getPlaylistLinks(search)
+                for search in links:
+                    try:
+                        source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
+                    except YTDLError as e:
+                        await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
+                        break
+                    else:
+                        song = Song(source)
+                    await ctx.voice_state.songs.addtop(song)
+                    i += 1
+                await ctx.send('Enqueued {} songs'.format(str(i)))
+            else:
+                try:
+                    source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
+                except YTDLError as e:
+                    await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
+                else:
+                    song = Song(source)
+
+                    await ctx.voice_state.songs.addtop(song)
                     await ctx.send('Enqueued {}'.format(str(source)))
 
     @_join.before_invoke
