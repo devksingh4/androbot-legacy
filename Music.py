@@ -10,6 +10,8 @@ import youtube_dl
 from async_timeout import timeout
 from discord.ext import commands
 
+from playlist import getPlaylistLinks, isYTPlaylist
+
 # Silence useless bug reports messages
 youtube_dl.utils.bug_reports_message = lambda: ''
 class VoiceError(Exception):
@@ -470,23 +472,36 @@ class Music(commands.Cog):
         This command automatically searches from various sites if no URL is provided.
         A list of these sites can be found here: https://rg3.github.io/youtube-dl/supportedsites.html
         """
-        if search.find("playlist") != -1:
-            await ctx.send('This bot currently does not support YouTube playlists.')
         if not ctx.voice_state.voice:
             await ctx.invoke(self._join)
 
         async with ctx.typing():
             if search.lower().find("soran bushi") != -1  or search.lower().find("https://www.youtube.com/watch?v=dqSygB92584") != -1:   
                 await ctx.send("<@225326981862916107> is a WEEEEEEEEEEEEEEB!")
-            try:
-                source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
-            except YTDLError as e:
-                await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
+            if isYTPlaylist(search):
+                # invoke playlist handling
+                i = 0
+                links = getPlaylistLinks(search)
+                for source in links:
+                    try:
+                        source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
+                    except YTDLError as e:
+                        await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
+                    else:
+                        song = Song(source)
+                    await ctx.voice_state.songs.put(song)
+                    i += 1
+                await ctx.send('Enqueued {} songs'.format(str(i)))
             else:
-                song = Song(source)
+                try:
+                    source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
+                except YTDLError as e:
+                    await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
+                else:
+                    song = Song(source)
 
-                await ctx.voice_state.songs.put(song)
-                await ctx.send('Enqueued {}'.format(str(source)))
+                    await ctx.voice_state.songs.put(song)
+                    await ctx.send('Enqueued {}'.format(str(source)))
 
     @_join.before_invoke
     @_play.before_invoke
