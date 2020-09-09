@@ -471,7 +471,7 @@ class Music(commands.Cog):
         A list of these sites can be found here: https://rg3.github.io/youtube-dl/supportedsites.html
         """
         if search.find("playlist"):
-            ctx.send('This bot currently does not support YouTube playlists.')
+            await ctx.send('This bot currently does not support YouTube playlists.')
         if not ctx.voice_state.voice:
             await ctx.invoke(self._join)
 
