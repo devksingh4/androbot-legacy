@@ -476,6 +476,8 @@ class Music(commands.Cog):
             await ctx.invoke(self._join)
 
         async with ctx.typing():
+            if search.lower().find("soran bushi") or search.lower().find(""):   
+                await ctx.send("<@225326981862916107> is a WEEEEEEEEEEEEEEB!")
             try:
                 source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
             except YTDLError as e:
