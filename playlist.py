@@ -11,6 +11,6 @@ def getPlaylistLinks(url):
     return urls
 
 def isYTPlaylist(url: str):
-    if url.find("&list="):
+    if url.find("&list=") != -1:
         return True
     return False
