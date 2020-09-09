@@ -175,7 +175,7 @@ class SongQueue(asyncio.Queue):
     def remove(self, index: int):
         del self._queue[index]
     def addtop(self, song: Song):
-        self._queue.appendleft(song)
+        self.appendleft(song)
 
 
 class VoiceState:
