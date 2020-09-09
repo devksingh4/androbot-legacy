@@ -131,11 +131,12 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
 
 class Song:
-    __slots__ = ('source', 'requester')
+    __slots__ = ('source', 'requester', 'url')
 
     def __init__(self, source: YTDLSource):
         self.source = source
         self.requester = source.requester
+        self.url = self.source.url
 
     def create_embed(self):
         if not self.source.duration:
@@ -146,7 +147,7 @@ class Song:
                 .add_field(name='Duration', value=self.source.duration)
                 .add_field(name='Requested by', value=self.requester.mention)
                 .add_field(name='Uploader', value='[{0.source.uploader}]({0.source.uploader_url})'.format(self))
-                .add_field(name='URL', value='[Click]({0.source.url})'.format(self))
+                .add_field(name='URL', value='[Click]({0.url})'.format(self))
                 .set_thumbnail(url=self.source.thumbnail))
 
         return embed
@@ -423,13 +424,9 @@ class Music(commands.Cog):
         queue = ''
         for i, song in enumerate(ctx.voice_state.songs[start:end], start=start):
             try:
-                if not song.source.time:
-                    queue += '`{0}.` [**{1.source.title}**]({1.source.url}) *LIVE*\n'.format(i + 1, song)
-                else:    
-                    queue += '`{0}.` [**{1.source.title}**]({1.source.url})\n'.format(i + 1, song)
+                queue += '`{0}.` [**{1.source.title}**]({1.url})\n'.format(i + 1, song)
             except:
-                queue += '`{0}.` {1.source}\n'.format(i + 1, song)
-
+                queue += '`{0}.` {1.source.title}\n'.format(i + 1, song)
         embed = (discord.Embed(description='**{} tracks:**\n\n{}'.format(len(ctx.voice_state.songs), queue))
                  .set_footer(text='Viewing page {}/{}'.format(page, pages)))
         await ctx.send(embed=embed)
