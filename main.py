@@ -49,7 +49,6 @@ async def clear(ctx, amount=0):
   else:
     try:
       await ctx.channel.purge(limit=amount)
-      await ctx.send("Messages Cleared")
     except discord.errors.Forbidden:
       await ctx.send("Bot does not have neccessary permissions to delete messages.")
 
