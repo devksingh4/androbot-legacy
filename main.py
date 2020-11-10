@@ -9,7 +9,8 @@ from discord.ext import commands
 from discord import Game, Embed
 from discord.voice_client import VoiceClient
 import asyncio as asyncio
-import schedule
+import time
+from discord.ext.tasks import loop
 
 client = commands.AutoShardedBot(command_prefix= '?')
 startup_extensions = ["Music"]
@@ -43,11 +44,13 @@ def createRandomSortedList(num, start = 1, end = 100):
       
     return arr 
 
+
 @client.event
 async def on_ready():
   global cache
+  global lastTime
   cache = [i for i in reddit.subreddit('memes').new() if not i.stickied]
-  schedule.every(5).minutes.do(refreshCache)
+  lastTime = time.time()
   print('Logged in as: ' + str(client.user.name) + ' ' + str(client.user.id))
   activity = discord.Game(name='?help | ' + str(len(client.guilds)) + ' guilds')
   await client.change_presence(activity=activity)
@@ -55,8 +58,11 @@ class Main_Commands():
   def __init__(self,client):
     self.client=client
 
-def refreshCache():
+@loop(seconds=150)
+async def refreshCache():
+  print('refing')
   cache = [i for i in reddit.subreddit('memes').new() if not i.stickied]
+  lastTime = time.time()
 
 @client.command()
 async def ping(ctx): 
@@ -93,4 +99,5 @@ async def meme(ctx, numMemes=None):
       for i in randomlist:
         selectedpost = cache[i]
         await ctx.send("Here is a random meme: ", embed=discord.Embed(title="Random meme").set_image(url=selectedpost.url))
+refreshCache.start()
 client.run(token)
