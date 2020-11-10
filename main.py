@@ -9,6 +9,7 @@ from discord.ext import commands
 from discord import Game, Embed
 from discord.voice_client import VoiceClient
 import asyncio as asyncio
+import schedule
 
 client = commands.AutoShardedBot(command_prefix= '?')
 startup_extensions = ["Music"]
@@ -41,9 +42,16 @@ def createRandomSortedList(num, start = 1, end = 100):
     arr.sort() 
       
     return arr 
+# ------
 
+# ------
 @client.event
 async def on_ready():
+  global cache
+  cache = [i for i in reddit.subreddit('memes').new() if not i.stickied]
+  def refreshCache():
+    cache = [i for i in reddit.subreddit('memes').new() if not i.stickied]
+  schedule.every(5).minutes.do(refreshCache)
   print('Logged in as: ' + str(client.user.name) + ' ' + str(client.user.id))
   activity = discord.Game(name='?help | ' + str(len(client.guilds)) + ' guilds')
   await client.change_presence(activity=activity)
@@ -69,12 +77,9 @@ async def clear(ctx, amount=0):
 async def meme(ctx, numMemes=None):
   """Sends a number of memes to a channel."""
   if numMemes == None:
-    meme_options = reddit.subreddit('memes').new()
     selectedpostnum = random.randint(1,100)
-    for i in range(0, selectedpostnum):
-      selectedpost = next(x for x in meme_options if not x.stickied)
-    e = discord.Embed(title="Random meme").set_image(url=selectedpost.url)
-    await ctx.send("Here is a random meme: ", embed=e)
+    selectedpost = cache[selectedpostnum]
+    await ctx.send("Here is a random meme: ", embed=discord.Embed(title="Random meme").set_image(url=selectedpost.url))
   else:
     try:
       if (int(numMemes) > 20 or int(numMemes) < 1):
@@ -87,8 +92,7 @@ async def meme(ctx, numMemes=None):
       x = int(numMemes)
       used = []
       randomlist = createRandomSortedList(x)
-      meme_options = [i for i in reddit.subreddit('memes').new() if not i.stickied]
       for i in randomlist:
-        selectedpost = meme_options[i]
+        selectedpost = cache[i]
         await ctx.send("Here is a random meme: ", embed=discord.Embed(title="Random meme").set_image(url=selectedpost.url))
 client.run(token)
