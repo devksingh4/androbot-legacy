@@ -54,7 +54,7 @@ async def clear(ctx, amount=0):
 async def meme(ctx, numMemes=None):
   if numMemes == None:
     meme_options = reddit.subreddit('memes').new()
-    selectedpostnum = random.randint(1,25)
+    selectedpostnum = random.randint(1,100)
     for i in range(0, selectedpostnum):
       selectedpost = next(x for x in meme_options if not x.stickied)
     e = discord.Embed(title="Random meme").set_image(url=selectedpost.url)
@@ -72,9 +72,9 @@ async def meme(ctx, numMemes=None):
       used = []
       while x > 0: 
         meme_options = reddit.subreddit('memes').new()
-        selectedpostnum = random.randint(1,25)
+        selectedpostnum = random.randint(1,100)
         while selectedpostnum in used:
-          selectedpostnum = random.randint(1,25)
+          selectedpostnum = random.randint(1,100)
         used.append(selectedpostnum)
         for i in range(0, selectedpostnum):
           selectedpost = next(x for x in meme_options if not x.stickied)
