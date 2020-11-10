@@ -83,7 +83,7 @@ async def meme(ctx, numMemes=None):
   if numMemes == None:
     selectedpostnum = random.randint(1,100)
     selectedpost = cache[selectedpostnum]
-    await ctx.send("Here is a random meme: ", embed=discord.Embed(title="Random meme").set_image(url=selectedpost.url))
+    await ctx.send("Here is a meme from r/memes: {}".format(selectedpost.url))
   else:
     try:
       if (int(numMemes) > 20 or int(numMemes) < 1):
@@ -97,14 +97,14 @@ async def meme(ctx, numMemes=None):
       randomlist = createRandomSortedList(x)
       for i in randomlist:
         selectedpost = cache[i]
-        await ctx.send("Here is a random meme: ", embed=discord.Embed(title="Random meme").set_image(url=selectedpost.url))
+        await ctx.send("Here is a meme from r/memes: {}".format(selectedpost.url))
 @client.command()
 async def funny(ctx, numMemes=None):
   """Sends a number of posts from r/funny to a channel."""
   if numMemes == None:
     selectedpostnum = random.randint(1,100)
     selectedpost = cache_funny[selectedpostnum]
-    await ctx.send("Here is a post from r/funny: ", embed=discord.Embed(title="r/funny").set_image(url=selectedpost.url))
+    await ctx.send("Here is a post from r/funny: {}".format(selectedpost.url))
   else:
     try:
       if (int(numMemes) > 20 or int(numMemes) < 1):
@@ -118,6 +118,6 @@ async def funny(ctx, numMemes=None):
       randomlist = createRandomSortedList(x)
       for i in randomlist:
         selectedpost = cache_funny[i]
-        await ctx.send("Here is a post from r/funny: ", embed=discord.Embed(title="r/funny").set_image(url=selectedpost.url))
+        await ctx.send("Here is a post from r/funny: {}".format(selectedpost.url))
 refreshCache.start()
 client.run(token)
