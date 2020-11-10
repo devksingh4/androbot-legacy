@@ -73,7 +73,8 @@ async def meme(ctx, numMemes=None):
     else: 
       x = int(numMemes)
       used = []
-      randomlist = random.sample(range(1, 100), x)
+      randomlist = range(1, 100)
+      random.shuffle(randomlist)
       while x > 0: 
         meme_options = [i for i in reddit.subreddit('memes').new() if not i.stickied]
         for i in randomlist:
