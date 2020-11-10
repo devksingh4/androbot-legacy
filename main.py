@@ -48,9 +48,9 @@ def createRandomSortedList(num, start = 1, end = 100):
 @client.event
 async def on_ready():
   global cache
-  global lastTime
+  global cache_funny
   cache = [i for i in reddit.subreddit('memes').new() if not i.stickied]
-  lastTime = time.time()
+  cache_funny = [i for i in reddit.subreddit('funny').new() if not i.stickied]
   print('Logged in as: ' + str(client.user.name) + ' ' + str(client.user.id))
   activity = discord.Game(name='?help | ' + str(len(client.guilds)) + ' guilds')
   await client.change_presence(activity=activity)
@@ -61,7 +61,7 @@ class Main_Commands():
 @loop(seconds=150)
 async def refreshCache():
   cache = [i for i in reddit.subreddit('memes').new() if not i.stickied]
-  lastTime = time.time()
+  cache_funny = [i for i in reddit.subreddit('funny').new() if not i.stickied]
 
 @client.command()
 async def ping(ctx): 
@@ -98,5 +98,26 @@ async def meme(ctx, numMemes=None):
       for i in randomlist:
         selectedpost = cache[i]
         await ctx.send("Here is a random meme: ", embed=discord.Embed(title="Random meme").set_image(url=selectedpost.url))
+@client.command()
+async def funny(ctx, numMemes=None):
+  """Sends a number of posts from r/funny to a channel."""
+  if numMemes == None:
+    selectedpostnum = random.randint(1,100)
+    selectedpost = cache_funny[selectedpostnum]
+    await ctx.send("Here is a post from r/funny: ", embed=discord.Embed(title="r/funny").set_image(url=selectedpost.url))
+  else:
+    try:
+      if (int(numMemes) > 20 or int(numMemes) < 1):
+        await ctx.send("Please provide a reasonable number of funny posts to send")
+        return
+    except:
+      await ctx.send("Please provide a reasonable number of funny posts")
+      return
+    else: 
+      x = int(numMemes)
+      randomlist = createRandomSortedList(x)
+      for i in randomlist:
+        selectedpost = cache_funny[i]
+        await ctx.send("Here is a post from r/funny: ", embed=discord.Embed(title="r/funny").set_image(url=selectedpost.url))
 refreshCache.start()
 client.run(token)
