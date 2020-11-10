@@ -51,13 +51,27 @@ async def clear(ctx, amount=0):
     await ctx.send("Messages Cleared")
 
 @client.command()
-async def meme(ctx):
-    async with ctx.typing():
-      meme_options = reddit.subreddit('memes').hot()
+async def meme(ctx, numMemes):
+  if numMemes:
+    meme_options = reddit.subreddit('memes').new()
+    selectedpostnum = random.randint(1,25)
+    for i in range(0, selectedpostnum):
+      selectedpost = next(x for x in meme_options if not x.stickied)
+    e = discord.Embed(title="Random meme").set_image(url=selectedpost.url)
+    await ctx.send("Here is a random meme: ", embed=e)
+  else:
+    x = numMemes
+    used = []
+    while x > 0: 
+      meme_options = reddit.subreddit('memes').new()
       selectedpostnum = random.randint(1,25)
+      while selectedpostnum in used:
+        selectedpostnum = random.randint(1,25)
+      used.append(selectedpostnum)
       for i in range(0, selectedpostnum):
         selectedpost = next(x for x in meme_options if not x.stickied)
       e = discord.Embed(title="Random meme").set_image(url=selectedpost.url)
       await ctx.send("Here is a random meme: ", embed=e)
+    x -= 1
 
 client.run(token)
