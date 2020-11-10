@@ -42,11 +42,8 @@ def createRandomSortedList(num, start = 1, end = 100):
     arr.sort() 
       
     return arr 
-# ------
 
-# ------
 @client.event
-
 async def on_ready():
   global cache
   cache = [i for i in reddit.subreddit('memes').new() if not i.stickied]
@@ -81,9 +78,6 @@ async def meme(ctx, numMemes=None):
   if numMemes == None:
     selectedpostnum = random.randint(1,100)
     selectedpost = cache[selectedpostnum]
-    if len(cache) < 2:
-      refreshCache()
-    cache.remove(selectedpostnum)
     await ctx.send("Here is a random meme: ", embed=discord.Embed(title="Random meme").set_image(url=selectedpost.url))
   else:
     try:
@@ -95,12 +89,8 @@ async def meme(ctx, numMemes=None):
       return
     else: 
       x = int(numMemes)
-      used = []
       randomlist = createRandomSortedList(x)
-      if len(cache) < x + 1:
-        refreshCache()
       for i in randomlist:
         selectedpost = cache[i]
-        cache.remove(i)
         await ctx.send("Here is a random meme: ", embed=discord.Embed(title="Random meme").set_image(url=selectedpost.url))
 client.run(token)
