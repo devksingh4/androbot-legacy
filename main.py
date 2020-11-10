@@ -78,46 +78,39 @@ async def clear(ctx, amount=0):
       await ctx.send("Bot does not have neccessary permissions to delete messages.")
 
 @client.command()
-async def meme(ctx, numMemes=None):
+async def meme(ctx, numMemes=1):
   """Sends a number of memes to a channel."""
-  if numMemes == None:
-    selectedpostnum = random.randint(1,100)
-    selectedpost = cache[selectedpostnum]
-    await ctx.send("Here is a meme from r/memes: {}".format(selectedpost.url))
-  else:
-    try:
-      if (int(numMemes) > 20 or int(numMemes) < 1):
-        await ctx.send("Please provide a reasonable number of memes")
-        return
-    except:
+  try:
+    if (int(numMemes) > 20 or int(numMemes) < 1):
       await ctx.send("Please provide a reasonable number of memes")
       return
+  except:
+    await ctx.send("Please provide a reasonable number of memes")
+    return
+  x = int(numMemes)
+  randomlist = createRandomSortedList(x)
+  for i in randomlist:
+    selectedpost = cache[i]
+    if "i.redd.it" in selectedpost.url:
+      await ctx.send("Here is a meme from r/memes: ", embed=discord.Embed(title="r/memes").set_image(url=selectedpost.url))
     else: 
-      x = int(numMemes)
-      randomlist = createRandomSortedList(x)
-      for i in randomlist:
-        selectedpost = cache[i]
-        await ctx.send("Here is a meme from r/memes: {}".format(selectedpost.url))
+      await ctx.send("Here is a meme from r/memes: {}".format(selectedpost.url))
 @client.command()
-async def funny(ctx, numMemes=None):
-  """Sends a number of posts from r/funny to a channel."""
-  if numMemes == None:
-    selectedpostnum = random.randint(1,100)
-    selectedpost = cache_funny[selectedpostnum]
-    await ctx.send("Here is a post from r/funny: {}".format(selectedpost.url))
-  else:
-    try:
-      if (int(numMemes) > 20 or int(numMemes) < 1):
-        await ctx.send("Please provide a reasonable number of funny posts to send")
-        return
-    except:
-      await ctx.send("Please provide a reasonable number of funny posts")
+async def funny(ctx, numMemes=1):
+  """Sends a number of memes to a channel."""
+  try:
+    if (int(numMemes) > 20 or int(numMemes) < 1):
+      await ctx.send("Please provide a reasonable number of posts to retrieve from r/funny")
       return
+  except:
+    await ctx.send("Please provide a reasonable number of posts to retrieve from r/funny")    return
+  x = int(numMemes)
+  randomlist = createRandomSortedList(x)
+  for i in randomlist:
+    selectedpost = cache_funny[i]
+    if "i.redd.it" in selectedpost.url:
+      await ctx.send("Here is a post from r/funny: ", embed=discord.Embed(title="r/funny").set_image(url=selectedpost.url))
     else: 
-      x = int(numMemes)
-      randomlist = createRandomSortedList(x)
-      for i in randomlist:
-        selectedpost = cache_funny[i]
-        await ctx.send("Here is a post from r/funny: {}".format(selectedpost.url))
+      await ctx.send("Here is a post from r/funny: {}".format(selectedpost.url))
 refreshCache.start()
 client.run(token)
