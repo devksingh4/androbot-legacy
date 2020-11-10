@@ -60,7 +60,6 @@ class Main_Commands():
 
 @loop(seconds=150)
 async def refreshCache():
-  print('refing')
   cache = [i for i in reddit.subreddit('memes').new() if not i.stickied]
   lastTime = time.time()
 
