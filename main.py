@@ -103,7 +103,8 @@ async def funny(ctx, numMemes=1):
       await ctx.send("Please provide a reasonable number of posts to retrieve from r/funny")
       return
   except:
-    await ctx.send("Please provide a reasonable number of posts to retrieve from r/funny")    return
+    await ctx.send("Please provide a reasonable number of posts to retrieve from r/funny")
+    return
   x = int(numMemes)
   randomlist = createRandomSortedList(x)
   for i in randomlist:
