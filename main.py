@@ -87,12 +87,9 @@ async def meme(ctx, numMemes=None):
       x = int(numMemes)
       used = []
       randomlist = createRandomSortedList(x)
-      while x > 0: 
-        meme_options = [i for i in reddit.subreddit('memes').new() if not i.stickied]
-        for i in randomlist:
-          selectedpost = meme_options[i]
-        e = discord.Embed(title="Random meme").set_image(url=selectedpost.url)
-        await ctx.send("Here is a random meme: ", embed=e)
-        x -= 1
-
+      meme_options = [i for i in reddit.subreddit('memes').new() if not i.stickied]
+      for i in randomlist:
+        selectedpost = meme_options[i]
+        print(selectedpost)
+        await ctx.send("Here is a random meme: ", embed=discord.Embed(title="Random meme").set_image(url=selectedpost.url))
 client.run(token)
