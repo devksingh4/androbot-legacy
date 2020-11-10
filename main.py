@@ -52,9 +52,12 @@ async def clear(ctx, amount=0):
 
 @client.command()
 async def meme(ctx, numMemes=None):
-  if (numMemes > 10 or numMemes < 0):
-        await ctx.send("Please ask for a reasonable number of memes.")
-        return
+  try:
+    if (numMemes > 10 or numMemes < 0):
+      await ctx.send("Please ask for a reasonable number of memes.")
+      return
+  except:
+    numMemes = 1
   if numMemes == None:
     meme_options = reddit.subreddit('memes').new()
     selectedpostnum = random.randint(1,25)
