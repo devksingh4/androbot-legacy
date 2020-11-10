@@ -52,12 +52,6 @@ async def clear(ctx, amount=0):
 
 @client.command()
 async def meme(ctx, numMemes=None):
-  try:
-    if (numMemes > 10 or numMemes < 0):
-      await ctx.send("Please ask for a reasonable number of memes.")
-      return
-  except:
-    numMemes = 1
   if numMemes == None:
     meme_options = reddit.subreddit('memes').new()
     selectedpostnum = random.randint(1,25)
@@ -77,7 +71,7 @@ async def meme(ctx, numMemes=None):
       for i in range(0, selectedpostnum):
         selectedpost = next(x for x in meme_options if not x.stickied)
       e = discord.Embed(title="Random meme").set_image(url=selectedpost.url)
-      await ctx.send("Here is meme #{}: ".format(str(x-numMemes)), embed=e)
+      await ctx.send("Here is a random meme: ", embed=e)
       x -= 1
 
 client.run(token)
