@@ -47,8 +47,11 @@ async def clear(ctx, amount=0):
   if (amount == 0):
     await ctx.send("Please specify how many messages are to be deleted.")
   else:
-    await ctx.channel.purge(limit=amount)
-    await ctx.send("Messages Cleared")
+    try:
+      await ctx.channel.purge(limit=amount)
+      await ctx.send("Messages Cleared")
+    except discord.errors.Forbidden:
+      await ctx.send("Bot does not have neccessary permissions to delete messages.")
 
 @client.command()
 async def meme(ctx, numMemes=None):
