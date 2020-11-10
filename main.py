@@ -60,7 +60,11 @@ async def meme(ctx, numMemes=None):
     e = discord.Embed(title="Random meme").set_image(url=selectedpost.url)
     await ctx.send("Here is a random meme: ", embed=e)
   else:
-    if (int(numMemes) > 20 or int(numMemes) < 1):
+    try:
+      if (int(numMemes) > 20 or int(numMemes) < 1):
+        await ctx.send("Please provide a reasonable number of memes")
+        return
+    except:
       await ctx.send("Please provide a reasonable number of memes")
       return
     else: 
