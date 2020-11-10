@@ -73,7 +73,8 @@ async def clear(ctx, amount=0):
     await ctx.send("Please specify how many messages are to be deleted.")
   else:
     try:
-      await ctx.channel.purge(limit=amount + 1)
+      realNum = amount + 1
+      await ctx.channel.purge(limit=realNum)
     except discord.errors.Forbidden:
       await ctx.send("Bot does not have neccessary permissions to delete messages.")
 
