@@ -60,7 +60,7 @@ async def meme(ctx, numMemes=None):
     e = discord.Embed(title="Random meme").set_image(url=selectedpost.url)
     await ctx.send("Here is a random meme: ", embed=e)
   else:
-    x = numMemes
+    x = int(numMemes)
     used = []
     while x > 0: 
       meme_options = reddit.subreddit('memes').new()
