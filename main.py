@@ -29,7 +29,7 @@ reddit_token = os.environ['RedditKey']
 
 
 reddit = praw.Reddit(client_id='ZOkK-ZCFJpcWCQ', client_secret=reddit_token, user_agent='CardNightBot by AsyncSGD', username='androstudios')
-def createRandomSortedList(num, start = 1, end = 100): 
+def createRandomSortedList(num, start = 1, end = 50): 
     arr = [] 
     tmp = random.randint(start, end) 
       
@@ -73,7 +73,7 @@ async def clear(ctx, amount=0):
     await ctx.send("Please specify how many messages are to be deleted.")
   else:
     try:
-      await ctx.channel.purge(limit=amount)
+      await ctx.channel.purge(limit=amount + 1)
     except discord.errors.Forbidden:
       await ctx.send("Bot does not have neccessary permissions to delete messages.")
 
@@ -94,7 +94,7 @@ async def meme(ctx, numMemes=1):
     if "i.redd.it" in selectedpost.url:
       await ctx.send("Here is a meme from r/memes: ", embed=discord.Embed(title="r/memes").set_image(url=selectedpost.url))
     else: 
-      await ctx.send("Here is a meme from r/memes: {}".format(selectedpost.url))
+      await ctx.send("Here is a meme from r/memes: {} \n\n*This post is a video. Please click on the link to see the full video*".format(selectedpost.url))
 @client.command()
 async def funny(ctx, numMemes=1):
   """Sends a number of memes to a channel."""
@@ -112,6 +112,6 @@ async def funny(ctx, numMemes=1):
     if "i.redd.it" in selectedpost.url:
       await ctx.send("Here is a post from r/funny: ", embed=discord.Embed(title="r/funny").set_image(url=selectedpost.url))
     else: 
-      await ctx.send("Here is a post from r/funny: {}".format(selectedpost.url))
+      await ctx.send("Here is a post from r/funny: {} \n\n *This post is a video. Please click on the link to see the full video*".format(selectedpost.url))
 refreshCache.start()
 client.run(token)
