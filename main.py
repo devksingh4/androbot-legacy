@@ -27,7 +27,20 @@ reddit_token = os.environ['RedditKey']
 
 
 reddit = praw.Reddit(client_id='ZOkK-ZCFJpcWCQ', client_secret=reddit_token, user_agent='CardNightBot by AsyncSGD', username='androstudios')
-
+def createRandomSortedList(num, start = 1, end = 100): 
+    arr = [] 
+    tmp = random.randint(start, end) 
+      
+    for x in range(num): 
+          
+        while tmp in arr: 
+            tmp = random.randint(start, end) 
+              
+        arr.append(tmp) 
+          
+    arr.sort() 
+      
+    return arr 
 
 @client.event
 async def on_ready():
@@ -73,9 +86,7 @@ async def meme(ctx, numMemes=None):
     else: 
       x = int(numMemes)
       used = []
-      randomlist = range(1, 100)
-      random.shuffle(randomlist)
-      randomlist = list(randomlist)
+      randomlist = createRandomSortedList(x)
       while x > 0: 
         meme_options = [i for i in reddit.subreddit('memes').new() if not i.stickied]
         for i in randomlist:
