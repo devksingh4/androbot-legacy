@@ -54,6 +54,7 @@ async def clear(ctx, amount=0):
 
 @client.command()
 async def meme(ctx, numMemes=None):
+  """Sends a number of memes to a channel."""
   if numMemes == None:
     meme_options = reddit.subreddit('memes').new()
     selectedpostnum = random.randint(1,100)
