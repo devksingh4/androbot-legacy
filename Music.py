@@ -479,7 +479,6 @@ class Music(commands.Cog):
             if search.lower().find("soran bushi") != -1  or search.lower().startswith("https://www.youtube.com/watch?v=dqSygB92584"):   
                 await ctx.send("<@225326981862916107> is a WEEEEEEEEEEEEEEB!")
             if isYTPlaylist(search):
-                print('hi')
                 # invoke playlist handling
                 i = 0
                 links = getPlaylistLinks(search)
