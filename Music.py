@@ -153,27 +153,37 @@ class Song:
         return embed
 
 
-class SongQueue(asyncio.Queue):
+class SongQueue(list):
+    def __init__(self): 
+        self._queue = []
     def __getitem__(self, item):
         if isinstance(item, slice):
             return list(itertools.islice(self._queue, item.start, item.stop, item.step))
         else:
             return self._queue[item]
-
+    def put(self, song):
+        self._queue.append(song)
     def __iter__(self):
-        return self._queue.__iter__()
-
+        return iter(self._queue)
+    def __str__(self):
+        return str(self._queue)
     def __len__(self):
-        return self.qsize()
-
+        return len(self._queue)
     def clear(self):
-        self._queue.clear()
-
+        self._queue = []
+    def get(self):
+        x = self._queue.pop(0)
+        print(x.url)
+        return x
     def shuffle(self):
         random.shuffle(self._queue)
-
     def remove(self, index: int):
         del self._queue[index]
+    def move(self, songPos, newPos):
+        print(songPos, newPos)
+        print(self._queue[songPos].url, self._queue[newPos].url)
+        self._queue.insert(newPos - 1, self._queue[songPos - 1])
+        del self._queue[songPos]
 
 
 class VoiceState:
@@ -224,13 +234,7 @@ class VoiceState:
                 # If no song will be added to the queue in time,
                 # the player will disconnect due to performance
                 # reasons.
-                try:
-                    async with timeout(180):  # 3 minutes
-                        self.current = await self.songs.get()
-                except asyncio.TimeoutError:
-                    self.bot.loop.create_task(self.stop())
-                    self.exists = False
-                    return
+                self.current = self.songs.get()
 
             self.current.source.volume = self._volume
             self.voice.play(self.current.source, after=self.play_next_song)
@@ -402,7 +406,10 @@ class Music(commands.Cog):
 
         else:
             await ctx.send('You have already voted to skip this song.')
-
+    @commands.command(name='debug')
+    async def _debug(self, ctx):
+        await ctx.send("Check console")
+        print(ctx.voice_state.songs)
     @commands.command(name='queue')
     async def _queue(self, ctx: commands.Context, *, page: int = 1):
         """Shows the player's queue.
@@ -450,7 +457,15 @@ class Music(commands.Cog):
 
         ctx.voice_state.songs.remove(index - 1)
         await ctx.message.add_reaction('✅')
+    @commands.command(name='move')
+    async def _remove(self, ctx: commands.Context, oldIndex: int, newIndex: int):
+        """Move a song from one index to another."""
 
+        if len(ctx.voice_state.songs) == 0:
+            return await ctx.send('Empty queue.')
+
+        ctx.voice_state.songs.move(oldIndex - 1, newIndex - 1)
+        await ctx.message.add_reaction('✅')
     @commands.command(name='loop')
     async def _loop(self, ctx: commands.Context):
         """Loops the currently playing song.
@@ -495,13 +510,16 @@ class Music(commands.Cog):
                 await ctx.send('Enqueued {} songs'.format(str(i)))
             else:
                 try:
+                    print('1')
                     source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
+                    print('2')
                 except YTDLError as e:
                     await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
+                    print('err')
                 else:
                     song = Song(source)
-
-                    await ctx.voice_state.songs.put(song)
+                    print('3')
+                    ctx.voice_state.songs.put(song)
                     await ctx.send('Enqueued {}'.format(str(source)))
 
     @_join.before_invoke
