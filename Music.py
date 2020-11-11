@@ -498,7 +498,6 @@ class Music(commands.Cog):
                     source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
                 except YTDLError as e:
                     await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
-                    print('hi')
                 else:
                     song = Song(source)
 
