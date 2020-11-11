@@ -4,7 +4,7 @@ import functools
 import itertools
 import math
 import random
-
+from functools import total_ordering
 import discord
 import youtube_dl
 from async_timeout import timeout
@@ -129,15 +129,16 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         return ', '.join(duration)
 
-
+@total_ordering
 class Song:
-    __slots__ = ('source', 'requester', 'url')
-
-    def __init__(self, source: YTDLSource):
+    __slots__ = ('source', 'requester', 'url', 'priority')
+    def __init__(self, source: YTDLSource, priority: int):
         self.source = source
         self.requester = source.requester
         self.url = self.source.url
-
+        self.priority = priority
+    def __lt__(self, other):
+        return self.priority < other.priority
     def create_embed(self):
         if not self.source.duration:
             self.source.duration = 'LIVE'
@@ -153,12 +154,12 @@ class Song:
         return embed
 
 
-class SongQueue(asyncio.Queue):
+class SongQueue(asyncio.PriorityQueue):
     def __getitem__(self, item):
         if isinstance(item, slice):
-            return list(itertools.islice(self._queue, item.start, item.stop, item.step))
+            return list(itertools.islice(self._queue, item.start, item.stop, item.step))[1]
         else:
-            return self._queue[item]
+            return self._queue[item][1]
 
     def __iter__(self):
         return self._queue.__iter__()
@@ -422,6 +423,7 @@ class Music(commands.Cog):
         end = start + items_per_page
 
         queue = ''
+        print(ctx.voice_state.songs[start:end])
         for i, song in enumerate(ctx.voice_state.songs[start:end], start=start):
             try:
                 queue += '`{0}.` [**{1.source.title}**]({1.url})\n'.format(i + 1, song)
@@ -463,7 +465,16 @@ class Music(commands.Cog):
         # Inverse boolean value to loop and unloop.
         ctx.voice_state.loop = not ctx.voice_state.loop
         await ctx.message.add_reaction('✅')
+    @commands.command(name='debug')
+    async def _debug(self, ctx: commands.Context):
+        """Removes a song from the queue at a given index."""
+        if len(ctx.voice_state.songs) == 0:
+            return await ctx.send('Empty queue.')
 
+        print(ctx.voice_state.songs)
+        for song in ctx.voice_state.songs:
+            print(song.priority)
+        await ctx.message.add_reaction('✅')
     @commands.command(name='play')
     async def _play(self, ctx: commands.Context, *, search: str):
         """Plays a song.
@@ -499,7 +510,7 @@ class Music(commands.Cog):
                 except YTDLError as e:
                     await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
                 else:
-                    song = Song(source)
+                    song = Song(source, ctx.voice_state.songs.__len__())
 
                     await ctx.voice_state.songs.put(song)
                     await ctx.send('Enqueued {}'.format(str(source)))
