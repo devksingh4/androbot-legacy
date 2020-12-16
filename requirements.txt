@@ -1,3 +1,4 @@
 discord.py[voice]
 praw
 youtube_dl
+bs4

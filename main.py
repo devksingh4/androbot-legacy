@@ -92,8 +92,8 @@ async def meme(ctx, numMemes=1):
   randomlist = createRandomSortedList(x)
   for i in randomlist:
     selectedpost = cache[i]
-    if "i.redd.it" in selectedpost.url:
-      await ctx.send("Here is a meme from r/memes: ", embed=discord.Embed(title="r/memes").set_image(url=selectedpost.url))
+    if "i.redd.it" in selectedpost.url or 'imgur' in selectedpost.url:
+      await ctx.send("Here is a meme from r/memes: https://reddit.com{}".format(selectedpost.permalink), embed=discord.Embed(title=selectedpost.title).set_image(url=selectedpost.url))
     else: 
       await ctx.send("Here is a meme from r/memes: {} \n\n*This post is a video. Please click on the link to see the full video*".format(selectedpost.url))
 @client.command()
@@ -110,9 +110,9 @@ async def funny(ctx, numMemes=1):
   randomlist = createRandomSortedList(x)
   for i in randomlist:
     selectedpost = cache_funny[i]
-    if "i.redd.it" in selectedpost.url:
-      await ctx.send("Here is a post from r/funny: ", embed=discord.Embed(title="r/funny").set_image(url=selectedpost.url))
+    if "i.redd.it" in selectedpost.url or 'imgur' in selectedpost.url:
+      await ctx.send("Here is a post from r/funny: https://reddit.com{}".format(selectedpost.permalink), embed=discord.Embed(title=selectedpost.title).set_image(url=selectedpost.url))
     else: 
-      await ctx.send("Here is a post from r/funny: {} \n\n *This post is a video. Please click on the link to see the full video*".format(selectedpost.url))
+      await ctx.send("Here is a post from r/funny: https://reddit.com{} \n\n *This post is a video. Please click on the link to see the full video*".format(selectedpost.permalink))
 refreshCache.start()
 client.run(token)
