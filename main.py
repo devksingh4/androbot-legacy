@@ -93,7 +93,6 @@ async def debuguser(ctx, user):
     debug_users.remove(user)
   else:
     debug_users.append(user)
-  await ctx.send("Done!")
 
 @client.command()
 async def meme(ctx, numMemes=1):
