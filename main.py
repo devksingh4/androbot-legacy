@@ -80,12 +80,7 @@ async def clear(ctx, amount=0):
 
 @client.event
 async def on_message(message):
-    if message.channel.id == message.author.dm_channel.id: # dm only
-        pass
-    elif not message.guild: # group dm only
-        pass
-    else: # server text channel
-        print(message.author)
+  print(message.author)
 
 @client.command()
 async def meme(ctx, numMemes=1):
