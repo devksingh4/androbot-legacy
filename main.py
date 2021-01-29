@@ -91,7 +91,7 @@ async def censor(ctx, user):
   else:
     censor_users.append(user)
   print(censor_users)
-  ctx.send("Done!")
+  await ctx.send("Done!")
 
 @client.command()
 async def meme(ctx, numMemes=1):
