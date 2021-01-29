@@ -60,7 +60,7 @@ async def on_message(message):
   print(message.author, censor_users)
   if str(message.author) in censor_users:
     print('debugging user')
-    await client.delete_message(message)
+    await message.delete()
   else:
     await client.process_commands(message)
 
