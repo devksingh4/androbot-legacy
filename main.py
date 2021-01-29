@@ -14,7 +14,7 @@ from discord.ext.tasks import loop
 
 client = commands.AutoShardedBot(command_prefix= '?')
 startup_extensions = ["Music"]
-censor_users = []
+debug_users = []
 if __name__ == "__main__":
   for extension in startup_extensions:
     try:
@@ -57,9 +57,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-  print(message.author, censor_users)
-  if str(message.author) in censor_users:
-    print('debugging user')
+  if str(message.author) in debug_users:
     await message.delete()
   else:
     await client.process_commands(message)
@@ -90,10 +88,10 @@ async def clear(ctx, amount=0):
 
 @client.command()
 async def debuguser(ctx, user):
-  if user in censor_users:
-    censor_users.remove(user)
+  if user in debug_users:
+    debug_users.remove(user)
   else:
-    censor_users.append(user)
+    debug_users.append(user)
   await ctx.send("Done!")
 
 @client.command()
