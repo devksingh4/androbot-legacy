@@ -68,6 +68,8 @@ class Main_Commands():
 
 @loop(seconds=150)
 async def refreshCache():
+  global cache
+  global cache_funny
   cache = [i for i in reddit.subreddit('memes').new() if not i.stickied]
   cache_funny = [i for i in reddit.subreddit('funny').new() if not i.stickied]
 
