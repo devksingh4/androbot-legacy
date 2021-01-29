@@ -57,6 +57,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+  print(message.author, censor_users)
   if message.author in censor_users:
     await client.delete_message(message)
   else:
@@ -92,7 +93,6 @@ async def debuguser(ctx, user):
     censor_users.remove(user)
   else:
     censor_users.append(user)
-  print(user, censor_users)
   await ctx.send("Done!")
 
 @client.command()
