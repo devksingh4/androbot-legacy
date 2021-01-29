@@ -90,6 +90,7 @@ async def censor(ctx, user):
     censor_users.remove(user)
   else:
     censor_users.append(user)
+  print(censor_users)
   ctx.send("Done!")
 
 @client.command()
