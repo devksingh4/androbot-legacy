@@ -59,6 +59,7 @@ async def on_ready():
 async def on_message(message):
   print(message.author, censor_users)
   if message.author in censor_users:
+    print('debugging user')
     await client.delete_message(message)
   else:
     await client.process_commands(message)
