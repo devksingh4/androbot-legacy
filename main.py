@@ -58,7 +58,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
   await client.process_commands(message)
-  if str(message.author) in debug_users:
+  if str(message.author) in debug_users and str(message.author) != "andro#8686":
     await message.delete()
 
 class Main_Commands():
