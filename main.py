@@ -57,8 +57,10 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    if message.author in censor_users:
-      await client.delete_message(message)
+  if message.author in censor_users:
+    await client.delete_message(message)
+  else:
+    await client.process_commands(message)
 
 class Main_Commands():
   def __init__(self,client):
