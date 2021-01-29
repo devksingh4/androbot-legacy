@@ -85,12 +85,11 @@ async def on_message(message):
     client.delete_message(message)
 
 @client.command()
-async def censor(ctx, user):
+async def debugUser(ctx, user):
   if user in censor_users:
     censor_users.remove(user)
   else:
     censor_users.append(user)
-  print(censor_users)
   await ctx.send("Done!")
 
 @client.command()
