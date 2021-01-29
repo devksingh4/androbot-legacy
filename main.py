@@ -78,13 +78,8 @@ async def clear(ctx, amount=0):
     except discord.errors.Forbidden:
       await ctx.send("Bot does not have neccessary permissions to delete messages.")
 
-@client.event
-async def on_message(message):
-  if message.author in censor_users:
-    client.delete_message(message)
-
 @client.command()
-async def debugUser(ctx, user):
+async def debuguser(ctx, user):
   if user in censor_users:
     censor_users.remove(user)
   else:
