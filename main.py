@@ -14,7 +14,7 @@ from discord.ext.tasks import loop
 
 client = commands.AutoShardedBot(command_prefix= '?')
 startup_extensions = ["Music"]
-
+censor_users = []
 if __name__ == "__main__":
   for extension in startup_extensions:
     try:
@@ -77,6 +77,15 @@ async def clear(ctx, amount=0):
       await ctx.channel.purge(limit=realNum)
     except discord.errors.Forbidden:
       await ctx.send("Bot does not have neccessary permissions to delete messages.")
+
+@client.event
+async def on_message(message):
+    if message.channel.id == message.author.dm_channel.id: # dm only
+        pass
+    elif not message.guild: # group dm only
+        pass
+    else: # server text channel
+        print(message.author)
 
 @client.command()
 async def meme(ctx, numMemes=1):
