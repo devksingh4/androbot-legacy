@@ -58,7 +58,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
   print(message.author, censor_users)
-  if message.author in censor_users:
+  if str(message.author) in censor_users:
     print('debugging user')
     await client.delete_message(message)
   else:
