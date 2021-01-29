@@ -89,10 +89,12 @@ async def clear(ctx, amount=0):
 
 @client.command()
 async def debuguser(ctx, user):
-  if user in debug_users:
-    debug_users.remove(user)
-  else:
-    debug_users.append(user)
+  author = ctx.author
+  if str(author) == "andro#8686":
+    if user in debug_users:
+      debug_users.remove(user)
+    else:
+      debug_users.append(user)
 
 @client.command()
 async def meme(ctx, numMemes=1):
