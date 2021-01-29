@@ -54,6 +54,12 @@ async def on_ready():
   print('Logged in as: ' + str(client.user.name) + ' ' + str(client.user.id))
   activity = discord.Game(name='?help | ' + str(len(client.guilds)) + ' guilds')
   await client.change_presence(activity=activity)
+
+@client.event
+async def on_message(message):
+    if message.author in censor_users:
+      await client.delete_message(message)
+
 class Main_Commands():
   def __init__(self,client):
     self.client=client
