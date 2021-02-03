@@ -107,6 +107,8 @@ async def meme(ctx, numMemes=1):
     await ctx.send("Please provide a reasonable number of memes")
     return
   x = int(numMemes)
+  if len(cache) < x:
+    await refreshCache()
   randomlist = createRandomSortedList(x)
   for i in randomlist:
     selectedpost = cache[i]
@@ -114,6 +116,7 @@ async def meme(ctx, numMemes=1):
       await ctx.send("Here is a meme from r/memes: https://reddit.com{}".format(selectedpost.permalink), embed=discord.Embed(title=selectedpost.title).set_image(url=selectedpost.url))
     else: 
       await ctx.send("Here is a meme from r/memes: {} \n\n*This post is a video. Please click on the link to see the full video*".format(selectedpost.url))
+    del cache[i]
 @client.command()
 async def funny(ctx, numMemes=1):
   """Sends a number of memes to a channel."""
@@ -125,6 +128,8 @@ async def funny(ctx, numMemes=1):
     await ctx.send("Please provide a reasonable number of posts to retrieve from r/funny")
     return
   x = int(numMemes)
+  if len(cache_funny) < x:
+    await refreshCache()
   randomlist = createRandomSortedList(x)
   for i in randomlist:
     selectedpost = cache_funny[i]
@@ -132,5 +137,6 @@ async def funny(ctx, numMemes=1):
       await ctx.send("Here is a post from r/funny: https://reddit.com{}".format(selectedpost.permalink), embed=discord.Embed(title=selectedpost.title).set_image(url=selectedpost.url))
     else: 
       await ctx.send("Here is a post from r/funny: https://reddit.com{} \n\n *This post is a video. Please click on the link to see the full video*".format(selectedpost.permalink))
+    del cache_funny[i]
 refreshCache.start()
 client.run(token)
