@@ -118,6 +118,16 @@ async def meme(ctx, numMemes=1):
       await ctx.send("Here is a meme from r/memes: {} \n\n*This post is a video. Please click on the link to see the full video*".format(selectedpost.url))
     del cache[i]
 @client.command()
+async def poll(ctx, question):
+  """Sets up a poll"""
+  if question == None:
+    await ctx.send("Please provide a poll question")
+    return
+  else:
+    await ctx.send("Feature not yet implemented!")
+    return
+  
+@client.command()
 async def funny(ctx, numMemes=1):
   """Sends a number of memes to a channel."""
   try:
