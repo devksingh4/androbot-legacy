@@ -125,6 +125,8 @@ async def poll(ctx, *args):
   emojis = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯', '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷']
   if len(args) < 1:
     await ctx.send("You buffoon! You should've provided poll question! You are ban!") 
+    await ctx.guild.ban(ctx.message.author, reason="Not providing all required parameters to bot command.")
+    await ctx.channel.send(f"{ctx.message.author} is banned!")
     return
   if len(args) - 1 > len(emojis):
     await ctx.send("Too many options provided! Please provide a maximum of {} options.".format(len(emojis)))
