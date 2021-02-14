@@ -70,6 +70,7 @@ async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
       await ctx.send("You buffoon! You should've provided all required parameters! You are ban!") 
       await ctx.guild.ban(ctx.message.author, reason="Not providing all required parameters to bot command.")
+      await ctx.channel.send(f"{ctx.message.author} is banned!")
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("You dont have all the requirements :angry:")
 @client.command()
