@@ -1,17 +1,27 @@
 import discord
-from discord import TextChannel
-import sys
 import os
 import praw
 import random
-import requests
+import asyncio
 from discord.ext import commands
-from discord import Game, Embed
-from discord.voice_client import VoiceClient
-import asyncio as asyncio
-import time
-from discord.ext.tasks import loop
+from multiprocessing import Pool
 
+from discord.ext.tasks import loop
+class Aiter :
+    def __init__(self, iterable):
+        self.iter_ = iter(iterable)
+
+    async def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        await asyncio.sleep(0)
+        try:
+            object = next(self.iter_)
+        except StopIteration:
+            raise StopAsyncIteration # :-) PEP492 - "To stop iteration __anext__ must raise a StopAsyncIteration exception"
+
+        return object
 client = commands.AutoShardedBot(command_prefix= '?')
 startup_extensions = ["Music"]
 debug_users = []
@@ -22,36 +32,36 @@ if __name__ == "__main__":
     except Exception as e:
       exc = '{}: {}'.format(type(e).__name__, e)
       raise SystemExit('Failed to load extension {}\n{}'.format(extension, exc))
-      
+
 
 token = os.environ['DiscordKey']
 reddit_token = os.environ['RedditKey']
 
 
-reddit = praw.Reddit(client_id='ZOkK-ZCFJpcWCQ', client_secret=reddit_token, user_agent='CardNightBot by AsyncSGD', username='androstudios')
-def createRandomSortedList(num, start = 1, end = 50): 
-    arr = [] 
-    tmp = random.randint(start, end) 
-      
-    for x in range(num): 
-          
-        while tmp in arr: 
-            tmp = random.randint(start, end) 
-              
-        arr.append(tmp) 
-          
-    arr.sort() 
-      
-    return arr 
+reddit = praw.Reddit(client_id='ZOkK-ZCFJpcWCQ', client_secret=reddit_token, user_agent='CardNightBot by AsyncSGD', username='androstudios', check_for_async=False)
+def createRandomSortedList(num, start = 1, end = 50):
+    arr = []
+    tmp = random.randint(start, end)
+
+    for x in range(num):
+
+        while tmp in arr:
+            tmp = random.randint(start, end)
+
+        arr.append(tmp)
+
+    arr.sort()
+
+    return arr
 
 
 @client.event
 async def on_ready():
+  print('Logged in as: ' + str(client.user.name) + ' ' + str(client.user.id))
   global cache
   global cache_funny
   cache = [i for i in reddit.subreddit('memes').new() if not i.stickied]
   cache_funny = [i for i in reddit.subreddit('funny').new() if not i.stickied]
-  print('Logged in as: ' + str(client.user.name) + ' ' + str(client.user.id))
   activity = discord.Game(name='?help | ' + str(len(client.guilds)) + ' guilds')
   await client.change_presence(activity=activity)
 
@@ -73,7 +83,7 @@ async def refreshCache():
   cache_funny = [i for i in reddit.subreddit('funny').new() if not i.stickied]
 
 @client.command()
-async def ping(ctx): 
+async def ping(ctx):
   await ctx.send('Pong!')
 
 @client.command()
@@ -114,21 +124,39 @@ async def meme(ctx, numMemes=1):
     selectedpost = cache[i]
     if "i.redd.it" in selectedpost.url or 'imgur' in selectedpost.url:
       await ctx.send("Here is a meme from r/memes: https://reddit.com{}".format(selectedpost.permalink), embed=discord.Embed(title=selectedpost.title).set_image(url=selectedpost.url))
-    else: 
+    else:
       await ctx.send("Here is a meme from r/memes: {} \n\n*This post is a video. Please click on the link to see the full video*".format(selectedpost.url))
     del cache[i]
+
 @client.command()
-async def poll(ctx, question):
-  """Sets up a poll"""
-  if question == None:
-    await ctx.send("Please provide a poll question")
+async def poll(ctx, *args):
+  """Creates a poll"""
+  emojis = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯', '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷', '🇸', '🇹', '🇺', '🇻', '🇼', '🇽', '🇾', '🇿']
+  if len(args) < 1:
+    await ctx.send("Please provide a poll question!")
+    return
+  if len(args) - 1 > len(emojis):
+    await ctx.send("Too many options provided! Please provide a maximum of {} options.".format(len(emojis)))
     return
   else:
-    embed=discord.Embed(title=question, color=0xff0000)
-    embed.set_author(name=ctx.author)
-    await ctx.send(embed=embed)
+    pfp = ctx.message.author.avatar_url
+    if len(args) == 1:
+      embed=discord.Embed(title=args[0], color=0xff0000)
+      embed.set_author(name=ctx.author, icon_url=pfp)
+      message = await ctx.send(embed=embed)
+      reactsToAdd = ['👍', '👎']
+      asyncio.gather(*map(lambda x: message.add_reaction(x), reactsToAdd))
+    else:
+      embed=discord.Embed(title=args[0], description="Select the emoji that corresponds with the option that you wish to vote for", color=0xff0000)
+      embed.set_author(name=ctx.author, icon_url=pfp)
+      opts = args[1:]
+      reactsToAdd = emojis[slice(0, len(args) - 1)]
+      for opt, emoji in zip(opts, reactsToAdd):
+        embed.add_field(name='"{}"'.format(opt), value=emoji, inline=True)
+      message = await ctx.send(embed=embed)
+      asyncio.gather(*map(lambda x: message.add_reaction(x), reactsToAdd))
     return
-  
+
 @client.command()
 async def funny(ctx, numMemes=1):
   """Sends a number of memes to a channel."""
@@ -147,7 +175,7 @@ async def funny(ctx, numMemes=1):
     selectedpost = cache_funny[i]
     if "i.redd.it" in selectedpost.url or 'imgur' in selectedpost.url:
       await ctx.send("Here is a post from r/funny: https://reddit.com{}".format(selectedpost.permalink), embed=discord.Embed(title=selectedpost.title).set_image(url=selectedpost.url))
-    else: 
+    else:
       await ctx.send("Here is a post from r/funny: https://reddit.com{} \n\n *This post is a video. Please click on the link to see the full video*".format(selectedpost.permalink))
     del cache_funny[i]
 refreshCache.start()
