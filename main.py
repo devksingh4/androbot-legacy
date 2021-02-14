@@ -65,7 +65,13 @@ async def refreshCache():
   global cache_funny
   cache = [i for i in reddit.subreddit('memes').new() if not i.stickied]
   cache_funny = [i for i in reddit.subreddit('funny').new() if not i.stickied]
-
+@client.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+      await ctx.send("You buffoon! You should've provided all required parameters! You are ban!") 
+      await ctx.guild.ban(ctx.message.author, reason="Not providing all required parameters to bot command.")
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("You dont have all the requirements :angry:")
 @client.command()
 async def ping(ctx):
   await ctx.send('Pong!')
@@ -117,7 +123,7 @@ async def poll(ctx, *args):
   """Creates a poll"""
   emojis = ['🇦', '🇧', '🇨', '🇩', '🇪', '🇫', '🇬', '🇭', '🇮', '🇯', '🇰', '🇱', '🇲', '🇳', '🇴', '🇵', '🇶', '🇷']
   if len(args) < 1:
-    await ctx.send("Please provide a poll question!")
+    await ctx.send("You buffoon! You should've provided poll question! You are ban!") 
     return
   if len(args) - 1 > len(emojis):
     await ctx.send("Too many options provided! Please provide a maximum of {} options.".format(len(emojis)))
