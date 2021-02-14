@@ -124,7 +124,9 @@ async def poll(ctx, question):
     await ctx.send("Please provide a poll question")
     return
   else:
-    await ctx.send("Feature not yet implemented!")
+    embed=discord.Embed(title=question, color=0xff0000)
+    embed.set_author(name=ctx.author)
+    await ctx.send(embed=embed)
     return
   
 @client.command()
