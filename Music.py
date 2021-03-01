@@ -291,7 +291,7 @@ class Music(commands.Cog):
             return True
         except:
             return False
-            
+
     def get_user_playlist(self, author):
         try:
             with open(f'playlists/{author}.txt', "r") as f:
@@ -488,8 +488,6 @@ class Music(commands.Cog):
         else:
             return await ctx.send(f'"{song}" could not be added to your playlist. Please, try again.')
 
-
-
     @commands.command(name='playFromSaved')
     async def _playFromSaved(self, ctx: commands.Context):
         """Add songs from your saved to the current playlist."""
@@ -507,6 +505,14 @@ class Music(commands.Cog):
                     song = Song(source)
                     await ctx.voice_state.songs.put(song)
             return await ctx.send(f'Enqueued {str(len(songs))} songs!')
+
+    @commands.command(name='showSaved')
+    async def _showSaved(self, ctx: commands.Context):
+        """Show saved songs."""
+        author = ctx.message.author.id
+        async with ctx.typing():
+            songs = self.get_user_playlist(author)
+            return await ctx.send(songs)
 
     @commands.command(name='play')
     async def _play(self, ctx: commands.Context, *, search: str):
