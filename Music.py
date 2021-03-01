@@ -530,15 +530,14 @@ class Music(commands.Cog):
 
         queue = ''
         for i, song in enumerate(songs, start=start):
-            song = Song(song)
+            song1 = Song(song)
             try:
-                queue += '`{0}.` [**{1.source.title}**]({1.url})\n'.format(i + 1, song)
+                queue += '`{0}.` [**{1.source.title}**]({1.url})\n'.format(i + 1, song1)
             except:
-                queue += '`{0}.` {1.source.title}\n'.format(i + 1, song)
+                queue += '`{0}.` {1.source.title}\n'.format(i + 1, song1)
         embed = (discord.Embed(description='**{} tracks:**\n\n{}'.format(len(ctx.voice_state.songs), queue))
                  .set_footer(text='Viewing page {}/{}'.format(page, pages)))
-        await ctx.send(embed=embed)
-        return await ctx.send(songs)
+        return await ctx.send(embed=embed)
 
     @commands.command(name='play')
     async def _play(self, ctx: commands.Context, *, search: str):
