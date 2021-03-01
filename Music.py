@@ -284,6 +284,14 @@ class Music(commands.Cog):
     async def cog_command_error(self, ctx: commands.Context, error: commands.CommandError):
         await ctx.send('An error occurred: {}'.format(str(error)))
 
+    def write_user_song(self, author, song):
+        try:
+            with open(f'{author}.txt', "a") as f:
+                f.write(f'{song}\n')
+            return True
+        except:
+            return False
+
     @commands.command(name='join', invoke_without_subcommand=True)
     async def _join(self, ctx: commands.Context):
         """Joins a voice channel."""
@@ -463,6 +471,23 @@ class Music(commands.Cog):
         # Inverse boolean value to loop and unloop.
         ctx.voice_state.loop = not ctx.voice_state.loop
         await ctx.message.add_reaction('✅')
+    @commands.command(name='addToSaved')
+    async def _addToSaved(self, ctx: commands.Context, *, song: str):
+        """Add a song to your saved playlist."""
+        author = ctx.message.author.id
+        rval = self.write_user_song(author, song)
+        if rval:
+            return await ctx.send(f'"{song}" was added to your playlist!')
+        else:
+            return await ctx.send(f'"{song}" could not be added to your playlist. Please, try again.')
+
+
+
+    @commands.command(name='playFromSaved')
+    async def _playFromSaved(self, ctx: commands.Context):
+        """Add songs from your saved to the current playlist."""
+        author = ctx.message.author.id
+        return await ctx.send('Not implemented yet.')
 
     @commands.command(name='play')
     async def _play(self, ctx: commands.Context, *, search: str):
