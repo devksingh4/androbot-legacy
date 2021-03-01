@@ -138,10 +138,10 @@ class Song:
         self.requester = source.requester
         self.url = self.source.url
 
-    def create_embed(self):
+    def create_embed(self, title="Now Playing"):
         if not self.source.duration:
             self.source.duration = 'LIVE'
-        embed = (discord.Embed(title='Now playing',
+        embed = (discord.Embed(title=title,
                             description='```css\n{0.source.title}\n```'.format(self),
                             color=discord.Color.blurple())
                 .add_field(name='Duration', value=self.source.duration)
@@ -482,9 +482,13 @@ class Music(commands.Cog):
     async def _addToSaved(self, ctx: commands.Context, *, song: str):
         """Add a song to your saved playlist."""
         author = ctx.message.author.id
+        try:
+            song = Song(song)
+        except:
+            return await ctx.send(f'"{song}" could not be added to your playlist. Please, try again.')
         rval = self.write_user_song(author, song)
         if rval:
-            return await ctx.send(f'"{song}" was added to your playlist!')
+            return await ctx.send(song.create_embed(title="Song added to playlist"))
         else:
             return await ctx.send(f'"{song}" could not be added to your playlist. Please, try again.')
 
@@ -507,12 +511,34 @@ class Music(commands.Cog):
             return await ctx.send(f'Enqueued {str(len(songs))} songs!')
 
     @commands.command(name='showSaved')
-    async def _showSaved(self, ctx: commands.Context):
+    async def _showSaved(self, ctx: commands.Context, *, page: int = 1):
         """Show saved songs."""
         author = ctx.message.author.id
-        async with ctx.typing():
-            songs = self.get_user_playlist(author)
-            return await ctx.send(songs)
+        songs = self.get_user_playlist(author)
+
+        if len(songs) == 0:
+            embed = (discord.Embed(title='Nothing saved for you',
+                description='Add a song with ?addToSaved',
+                color=discord.Color.red()))
+            return await ctx.send(embed=embed)
+
+        items_per_page = 10
+        pages = math.ceil(len(ctx.voice_state.songs) / items_per_page)
+
+        start = (page - 1) * items_per_page
+        end = start + items_per_page
+
+        queue = ''
+        for i, song in enumerate(songs, start=start):
+            song = Song(song)
+            try:
+                queue += '`{0}.` [**{1.source.title}**]({1.url})\n'.format(i + 1, song)
+            except:
+                queue += '`{0}.` {1.source.title}\n'.format(i + 1, song)
+        embed = (discord.Embed(description='**{} tracks:**\n\n{}'.format(len(ctx.voice_state.songs), queue))
+                 .set_footer(text='Viewing page {}/{}'.format(page, pages)))
+        await ctx.send(embed=embed)
+        return await ctx.send(songs)
 
     @commands.command(name='play')
     async def _play(self, ctx: commands.Context, *, search: str):
