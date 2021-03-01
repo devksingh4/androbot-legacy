@@ -286,9 +286,16 @@ class Music(commands.Cog):
 
     def write_user_song(self, author, song):
         try:
-            with open(f'{author}.txt', "a") as f:
+            with open(f'playlists/{author}.txt', "a") as f:
                 f.write(f'{song}\n')
             return True
+        except:
+            return False
+            
+    def get_user_playlist(self, author):
+        try:
+            with open(f'playlists/{author}.txt', "r") as f:
+                return list(map(lambda x: x.strip(), f.readlines()))
         except:
             return False
 
@@ -487,7 +494,19 @@ class Music(commands.Cog):
     async def _playFromSaved(self, ctx: commands.Context):
         """Add songs from your saved to the current playlist."""
         author = ctx.message.author.id
-        return await ctx.send('Not implemented yet.')
+        if not ctx.voice_state.voice:
+            await ctx.invoke(self._join)
+        async with ctx.typing():
+            songs = self.get_user_playlist(author)
+            for search in songs:
+                try:
+                    source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
+                except YTDLError as e:
+                    await ctx.send(f'"{search}" could not be added to the queue.')
+                else:
+                    song = Song(source)
+                    await ctx.voice_state.songs.put(song)
+            return await ctx.send(f'Enqueued {str(len(songs))} songs!')
 
     @commands.command(name='play')
     async def _play(self, ctx: commands.Context, *, search: str):
