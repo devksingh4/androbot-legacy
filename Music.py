@@ -291,11 +291,27 @@ class Music(commands.Cog):
             return True
         except:
             return False
-
+    def overwrite_user_songs(self, author, songs):
+        try:
+            with open(f'playlists/{author}.txt', "w") as f:
+                f.writelines(songs)
+                f.writelines(['\n'])
+            return True
+        except:
+            return False
     def get_user_playlist(self, author):
         try:
             with open(f'playlists/{author}.txt', "r") as f:
                 return list(map(lambda x: x.strip(), f.readlines()))
+        except:
+            return False
+
+    def remove_user_playlist(self, author, index):
+        try:
+            playlist = self.get_user_playlist(author=author)
+            playlist.pop(index)
+            self.overwrite_user_songs(author, playlist)
+            return True
         except:
             return False
 
@@ -443,7 +459,7 @@ class Music(commands.Cog):
             except:
                 queue += '`{0}.` {1.source.title}\n'.format(i + 1, song)
         embed = (discord.Embed(description='**{} tracks:**\n\n{}'.format(len(ctx.voice_state.songs), queue))
-                 .set_footer(text='Viewing page {}/{}'.format(page, pages)))
+                 .set_footer(text='Viewing page {}/{}'.format(page, max(pages, 1))))
         await ctx.send(embed=embed)
 
     @commands.command(name='shuffle')
@@ -479,16 +495,21 @@ class Music(commands.Cog):
         ctx.voice_state.loop = not ctx.voice_state.loop
         await ctx.message.add_reaction('✅')
     @commands.command(name='addToSaved')
-    async def _addToSaved(self, ctx: commands.Context, *, song: str):
+    async def _addToSaved(self, ctx: commands.Context, *, song_query: str):
         """Add a song to your saved playlist."""
         author = ctx.message.author.id
         try:
-            song = Song(song)
-        except:
-            return await ctx.send(f'"{song}" could not be added to your playlist. Please, try again.')
-        rval = self.write_user_song(author, song)
+            source = await YTDLSource.create_source(ctx, song_query, loop=False)
+            song = Song(source)
+        except Exception as e:
+            print(e)
+            return await ctx.send(f'"{song_query}" could not be added to your playlist. Please, try again.')
+        rval = self.write_user_song(author, song_query)
         if rval:
-            return await ctx.send(song.create_embed(title="Song added to playlist"))
+            await ctx.send(embed=song.create_embed(title="Song added to playlist"))
+            if ctx.voice_state.voice:
+                await ctx.voice_state.songs.put(song)
+            return
         else:
             return await ctx.send(f'"{song}" could not be added to your playlist. Please, try again.')
 
@@ -500,6 +521,7 @@ class Music(commands.Cog):
             await ctx.invoke(self._join)
         async with ctx.typing():
             songs = self.get_user_playlist(author)
+            await ctx.send(f'Enqueued {str(len(songs))} songs!')
             for search in songs:
                 try:
                     source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
@@ -508,7 +530,7 @@ class Music(commands.Cog):
                 else:
                     song = Song(source)
                     await ctx.voice_state.songs.put(song)
-            return await ctx.send(f'Enqueued {str(len(songs))} songs!')
+        return
 
     @commands.command(name='showSaved')
     async def _showSaved(self, ctx: commands.Context, *, page: int = 1):
@@ -530,14 +552,30 @@ class Music(commands.Cog):
 
         queue = ''
         for i, song in enumerate(songs, start=start):
-            song1 = Song(song)
+            source = await YTDLSource.create_source(ctx, song, loop=False)
+            song1 = Song(source)
             try:
                 queue += '`{0}.` [**{1.source.title}**]({1.url})\n'.format(i + 1, song1)
             except:
                 queue += '`{0}.` {1.source.title}\n'.format(i + 1, song1)
-        embed = (discord.Embed(description='**{} tracks:**\n\n{}'.format(len(ctx.voice_state.songs), queue))
-                 .set_footer(text='Viewing page {}/{}'.format(page, pages)))
+        embed = (discord.Embed(description='**{} tracks:**\n\n{}'.format(len(songs), queue))
+                 .set_footer(text='Viewing page {}/{}'.format(page, max(pages, 1))))
         return await ctx.send(embed=embed)
+
+    @commands.command(name='removeFromSaved')
+    async def _removeFromSaved(self, ctx: commands.Context, *, index: int):
+        """Loops the currently playing song.
+        Invoke this command again to unloop the song.
+        """
+        index = index - 1
+        numinlist = len(self.get_user_playlist(author=ctx.message.author.id))
+        if numinlist <= index:
+            return await ctx.send(f'Cannot remove song at {index +1} because there are only {numinlist} songs saved!')
+        rval = self.remove_user_playlist(author=ctx.message.author.id, index=index)
+        if rval:
+            return await ctx.message.add_reaction('✅')
+        else: 
+            return await ctx.send("Could not remove song. Please, try again.")
 
     @commands.command(name='play')
     async def _play(self, ctx: commands.Context, *, search: str):
