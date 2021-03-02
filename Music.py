@@ -510,7 +510,7 @@ class Music(commands.Cog):
         # Inverse boolean value to loop and unloop.
         ctx.voice_state.loop = not ctx.voice_state.loop
         await ctx.message.add_reaction('✅')
-    @commands.command(name='addToSaved')
+    @commands.command(name='save')
     async def _addToSaved(self, ctx: commands.Context, *, song_query: str):
         """Add a song to your saved playlist."""
         author = ctx.message.author.id
@@ -529,7 +529,7 @@ class Music(commands.Cog):
         else:
             return await ctx.send(f'"{song_query}" could not be added to your playlist. Please, try again.')
 
-    @commands.command(name='playFromSaved')
+    @commands.command(name='playSaved')
     async def _playFromSaved(self, ctx: commands.Context):
         """Add songs from your saved to the current playlist."""
         author = ctx.message.author.id
@@ -581,11 +581,9 @@ class Music(commands.Cog):
                  .set_footer(text='Viewing page {}/{}'.format(page, max(pages, 1))))
         return await ctx.send(embed=embed)
 
-    @commands.command(name='removeFromSaved')
+    @commands.command(name='removeSaved')
     async def _removeFromSaved(self, ctx: commands.Context, *, index: int):
-        """Loops the currently playing song.
-        Invoke this command again to unloop the song.
-        """
+        """Removed a song that is saved."""
         index = index - 1
         numinlist = len(self.get_user_playlist(author=ctx.message.author.id))
         if numinlist <= index:
