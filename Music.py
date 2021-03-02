@@ -514,20 +514,32 @@ class Music(commands.Cog):
     async def _addToSaved(self, ctx: commands.Context, *, song_query: str):
         """Add a song to your saved playlist."""
         author = ctx.message.author.id
-        try:
-            source = await YTDLSource.create_source(ctx, song_query, loop=False)
-            song = Song(source)
-        except Exception as e:
-            print(e)
-            return await ctx.send(f'"{song_query}" could not be added to your playlist. Please, try again.')
-        rval = self.write_user_song(author, song_query)
-        if rval:
-            await ctx.send(embed=song.create_embed(title="Song added to playlist"))
-            if ctx.voice_state.voice:
-                await ctx.voice_state.songs.put(song)
-            return
+        if isYTPlaylist(song_query):
+            links = getPlaylistLinks(song_query)
+            for query in links:
+                rval = self.write_user_song(author, query)
+                if rval:
+                    if ctx.voice_state.voice:
+                        await ctx.voice_state.songs.put(query)
+                    return
+                else:
+                    return await ctx.send(f'"{song_query}" could not be added to your playlist. Please, try again.')
+            return await ctx.send(f"Enqueued {len(links)} songs.")
         else:
-            return await ctx.send(f'"{song_query}" could not be added to your playlist. Please, try again.')
+            try:
+                source = await YTDLSource.create_source(ctx, song_query, loop=False)
+                song = Song(source)
+            except Exception as e:
+                print(e)
+                return await ctx.send(f'"{song_query}" could not be added to your playlist. Please, try again.')
+            rval = self.write_user_song(author, song_query)
+            if rval:
+                await ctx.send(embed=song.create_embed(title="Song added to playlist"))
+                if ctx.voice_state.voice:
+                    await ctx.voice_state.songs.put(song)
+                return
+            else:
+                return await ctx.send(f'"{song_query}" could not be added to your playlist. Please, try again.')
 
     @commands.command(name='playSaved')
     async def _playFromSaved(self, ctx: commands.Context):
