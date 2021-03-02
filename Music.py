@@ -511,7 +511,7 @@ class Music(commands.Cog):
                 await ctx.voice_state.songs.put(song)
             return
         else:
-            return await ctx.send(f'"{song}" could not be added to your playlist. Please, try again.')
+            return await ctx.send(f'"{song_query}" could not be added to your playlist. Please, try again.')
 
     @commands.command(name='playFromSaved')
     async def _playFromSaved(self, ctx: commands.Context):
