@@ -632,7 +632,7 @@ class Music(commands.Cog):
                         break
                     else:
                         song = Song(source)
-                    await ctx.voice_state.songs.put(song)
+                    ctx.voice_state.songs.put_nowait(song)
                     i += 1
                 await ctx.send('Enqueued {} songs'.format(str(i)))
             else:
@@ -643,7 +643,7 @@ class Music(commands.Cog):
                 else:
                     song = Song(source)
 
-                    await ctx.voice_state.songs.put(song)
+                    ctx.voice_state.songs.put_nowait(song)
                     await ctx.send('Enqueued {}'.format(str(source)))
 
     @_join.before_invoke
