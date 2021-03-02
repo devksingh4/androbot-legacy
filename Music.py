@@ -481,6 +481,22 @@ class Music(commands.Cog):
 
         ctx.voice_state.songs.remove(index - 1)
         await ctx.message.add_reaction('✅')
+        
+    @commands.command(name='move')
+    async def _move(self, ctx: commands.Context, old: int, new: int):
+        """Removes a song from the queue at a given index."""
+        lenq = len(ctx.voice_state.songs)
+        if lenq == 0:
+            return await ctx.send('Empty queue.')
+        if lenq < old or lenq < new or old < 1 or new < 1:
+            return await ctx.send('Index too large.')
+        temp = list(ctx.voice_state.songs)
+        temp.insert(new - 1, temp.pop(old -1))
+        tempqueue = SongQueue()
+        for item in temp:
+            tempqueue.put_nowait(item)    
+        ctx.voice_state.songs = tempqueue
+        await ctx.message.add_reaction('✅')
 
     @commands.command(name='loop')
     async def _loop(self, ctx: commands.Context):
