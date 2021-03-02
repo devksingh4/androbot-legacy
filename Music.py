@@ -566,6 +566,7 @@ class Music(commands.Cog):
     @commands.command(name='showSaved')
     async def _showSaved(self, ctx: commands.Context, *, page: int = 1):
         """Show saved songs."""
+        await ctx.message.add_reaction('✅')
         author = ctx.message.author.id
         songs = self.get_user_playlist(author)
 
