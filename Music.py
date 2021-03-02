@@ -583,8 +583,11 @@ class Music(commands.Cog):
 
         queue = ''
         for i, song in enumerate(songs, start=start):
-            source = await YTDLSource.create_source(ctx, song, loop=False)
-            song1 = Song(source)
+            try:
+                source = await YTDLSource.create_source(ctx, song, loop=False)
+                song1 = Song(source)
+            except:
+                pass
             try:
                 queue += '`{0}.` [**{1.source.title}**]({1.url})\n'.format(i + 1, song1)
             except:
