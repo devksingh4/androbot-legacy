@@ -518,7 +518,10 @@ class Music(commands.Cog):
         """Add songs from your saved to the current playlist."""
         author = ctx.message.author.id
         if not ctx.voice_state.voice:
-            await ctx.invoke(self._join)
+            try:
+                await ctx.invoke(self._join)
+            except AttributeError:
+                raise commands.CommandError('You are not connected to any voice channel.')
         async with ctx.typing():
             songs = self.get_user_playlist(author)
             await ctx.send(f'Enqueued {str(len(songs))} songs!')
