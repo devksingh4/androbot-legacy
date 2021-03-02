@@ -617,34 +617,31 @@ class Music(commands.Cog):
         if not ctx.voice_state.voice:
             await ctx.invoke(self._join)
 
-        async with ctx.typing():
-            if search.lower().find("soran bushi") != -1  or search.lower().startswith("https://www.youtube.com/watch?v=dqSygB92584"):   
-                await ctx.send("<@225326981862916107> is a WEEEEEEEEEEEEEEB!")
-            if isYTPlaylist(search):
-                # invoke playlist handling
-                i = 0
-                links = getPlaylistLinks(search)
-                for search in links:
-                    try:
-                        source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
-                    except YTDLError as e:
-                        await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
-                        break
-                    else:
-                        song = Song(source)
-                    ctx.voice_state.songs.put_nowait(song)
-                    i += 1
-                await ctx.send('Enqueued {} songs'.format(str(i)))
-            else:
+        if search.lower().find("soran bushi") != -1  or search.lower().startswith("https://www.youtube.com/watch?v=dqSygB92584"):   
+            await ctx.send("<@225326981862916107> is a WEEEEEEEEEEEEEEB!")
+        if isYTPlaylist(search):
+            # invoke playlist handling
+            links = getPlaylistLinks(search)
+            await ctx.send('Enqueuing {} songs'.format(len(links)))
+            for search in links:
                 try:
                     source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
                 except YTDLError as e:
                     await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
+                    break
                 else:
                     song = Song(source)
+                ctx.voice_state.songs.put_nowait(song)
+        else:
+            try:
+                source = await YTDLSource.create_source(ctx, search, loop=self.bot.loop)
+            except YTDLError as e:
+                await ctx.send('An error occurred while processing this request: {}'.format(str(e)))
+            else:
+                song = Song(source)
 
-                    ctx.voice_state.songs.put_nowait(song)
-                    await ctx.send('Enqueued {}'.format(str(source)))
+                ctx.voice_state.songs.put_nowait(song)
+                await ctx.send('Enqueued {}'.format(str(source)))
 
     @_join.before_invoke
     @_play.before_invoke
